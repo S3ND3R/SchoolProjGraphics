@@ -16,8 +16,12 @@ if [ $GENERATORS -eq 0 ]; then
 	then
 		CC="/soft/gcc/7.1.0/Linux_x86_64/bin/gcc"
 		CXX="/soft/gcc/7.1.0/Linux_x86_64/bin/g++"
+                echo $CC $CXX
+		#exit 1
 	fi
 
+    export CC=$CC
+    export CXX=$CXX
     cmake .. -DCMAKE_INSTALL_PREFIX=../../.. -DAUTOBUILD_DEPENDENCIES=ON -DAUTOBUILD_EXECUTE_NOW=ON
 else
 	if [ -z "$1" ];
