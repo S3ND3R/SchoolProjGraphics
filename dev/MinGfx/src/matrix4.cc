@@ -215,7 +215,7 @@ Matrix4 Matrix4::Perspective(float fovyInDegrees, float aspectRatio,
 {
     // https://www.khronos.org/opengl/wiki/GluPerspective_code
     float ymax, xmax;
-    ymax = std::tanf(fovyInDegrees * M_PI / 360.0)* nearVal;
+    ymax = tanf(fovyInDegrees * M_PI / 360.0)* nearVal;
     // ymin = -ymax;
     // xmin = -ymax * aspectRatio;
     xmax = ymax * aspectRatio;
