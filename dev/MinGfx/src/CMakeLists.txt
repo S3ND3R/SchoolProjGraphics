@@ -10,7 +10,7 @@ set(HEADERFILES
     src/default_shader.h
     src/gfxmath.h
     src/graphics_app.h
-    src/matrix4.h
+    src/matrix4.ha
     src/mesh.h
     src/mingfx.h
     src/mingfx_config.h
@@ -94,12 +94,6 @@ AutoBuild_use_package_NanoGUI(MinGfx PUBLIC)
 # Add external dependency on OpenGL
 include(AutoBuildOpenGL)
 AutoBuild_use_package_OpenGL(MinGfx PUBLIC)
-
-option(ALLOW_INIT_GFX_CTX_IN_CONSTRUCTOR "Allows graphics contexts to initialize in the application constructor." ON)
-
-if(ALLOW_INIT_GFX_CTX_IN_CONSTRUCTOR)
-    target_compile_definitions(MinGfx PUBLIC -DALLOW_INIT_GFX_CTX_IN_CONSTRUCTOR)
-endif()
 
 install(TARGETS MinGfx EXPORT MinGfxTargets COMPONENT CoreLib
   LIBRARY DESTINATION ${INSTALL_LIB_DEST}
