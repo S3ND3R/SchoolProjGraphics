@@ -10,7 +10,7 @@ set(HEADERFILES
     src/default_shader.h
     src/gfxmath.h
     src/graphics_app.h
-    src/matrix4.ha
+    src/matrix4.h
     src/mesh.h
     src/mingfx.h
     src/mingfx_config.h
