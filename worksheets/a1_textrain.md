@@ -1,12 +1,18 @@
 # Assignment 1 (Text Rain) Worksheet
 
 For the conceptual worksheets in this course, we'll provide a Markdown
-template from the support code repository, and you'll commit your answers to
-GitHub in the `worksheets` folder of your repository. If you're unfamiliar
-with Markdown syntax, [check out this lovely guide provided by
+template from the shared-upstream repository. As described in the Canvas
+assignment handouts, you'll pull each Markdown template into your repository,
+directly edit your local copy with your answers, and commit and push your
+answers to GitHub in your `worksheets` folder of your repository. If you're
+unfamiliar with Markdown syntax, [check out this lovely guide provided by
 GitHub](https://guides.github.com/features/mastering-markdown/) before you get
 started.
 
+_Do not make a copy of the provided Markdown template and submit that instead._
+Our grading scripts will be looking for these modified files within your
+`worksheets` folder of your repository. Do not change the filenames, simply
+modify the contents.
 
 ## Background
 
