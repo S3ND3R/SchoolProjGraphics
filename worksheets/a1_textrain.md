@@ -9,10 +9,15 @@ unfamiliar with Markdown syntax, [check out this lovely guide provided by
 GitHub](https://guides.github.com/features/mastering-markdown/) before you get
 started.
 
-_Do not make a copy of the provided Markdown template and submit that instead._
+## Notes
+
+* _Do not make a copy of the provided Markdown template and submit that instead._
 Our grading scripts will be looking for these modified files within your
 `worksheets` folder of your repository. Do not change the filenames, simply
 modify the contents.
+* This worksheet is intended to help ease you into the world of graphics
+programming and is meant to be a "warmup." Try not to overthink! Just because
+an answer is simple does not mean that it is wrong.
 
 ## Background
 
