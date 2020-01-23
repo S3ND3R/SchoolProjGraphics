@@ -35,13 +35,14 @@ Processing](https://processing.org/tutorials/color/).
 As mentioned in the assignment handout, accessing/setting pixel data via
 Processing's `get()` and `set()` routines is a bit easier to code, but it's
 much slower than directly accessing/changing a [PImage
-object's](https://processing.org/reference/PImage.html) `pixels[]` array.
-Processing stores a 2D image in this 1D array, so getting the proper pixel out
-requires a little additional math.
+object's](https://processing.org/reference/PImage.html) 1D `pixels[]` array.
+Processing stores the pixels of a 2D image in this 1D array; this can be
+thought of as "flattening" the image. Because of this flattening, getting the
+proper pixel value requires a little additional math.
 
-In the code block below, write the equation for obtaining the index in the 1D
-array from a (row, column) in the 2D pixels array. Keep in mind you can use
-information from `inputImg` to help you.
+In the code block below, write the equation for calculating the 1D index of a
+pixel from its 2D (row, column) index. Keep in mind you can use information
+from `inputImg` to help you.
 
 ```
 PImage inputImg = loadImage("test.jpg");
