@@ -47,7 +47,7 @@ from `inputImg` to help you.
 ```
 PImage inputImg = loadImage("test.jpg");
 
-int index1D = /* --- Fill this in --- */;
+int index1D = row * inputImg.width + column;
 ```
 
 
