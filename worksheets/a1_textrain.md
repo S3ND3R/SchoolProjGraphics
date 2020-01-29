@@ -67,8 +67,12 @@ final int threshold = 128;
 
 // Returns: thresholded color (black or white)
 color thresholdPixel(color inputPixel) {
-
-  /* --- Fill this in --- */
-
+  color black = color(0);
+  color white = color(255);
+  float gVal = green(inputPixel);
+  if (gVal > threshold) {
+    return white;
+  }
+  return black;
 }
 ```
