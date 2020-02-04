@@ -1,15 +1,15 @@
 # Getting Started with MinGfx and CMake
 
-If you encounter any issues, please begin by checking the Canvas forum on [Assignment 2 and MinGfx Setup](https://canvas.umn.edu/courses/106184/discussion_topics/169908) for help, or email the TAs if you are really stuck: [csci4611@umn.edu](mailto:csci4611@umn.edu).  
+If you encounter any issues, please begin by checking [Piazza](https://piazza.com/class/k5o7m9d4vq710p) for help and checking the posts under the `mingfx-setup` folder. If that does not help, leave a post of your own or attend office hours. If you are really stuck send an email: [csci4611@umn.edu](mailto:csci4611@umn.edu).  
 
-It is extremely helpful to outline the steps you took in the email. This helps us reproduce the problem and more quickly find a solution.
+It is extremely helpful to outline the steps you took in your Piazza post or in your email. This helps us reproduce the problem and more quickly find a solution.
 
 ## Initial setup for a new computer
 
 #### 0) Prereq: A computer and C++ compiler
 
 * CSE Labs: The machines in the labs should already be setup for this step.
-* Windows: You need to have Visual Studio 2015 or later installed.
+* Windows: You need to have Visual Studio 2015 or later with the ["Desktop development with C++" workload](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=vs-2019) installed.
 * OSX: You need to have Xcode installed AND you need to [install Xcode command line tools](https://www.embarcadero.com/starthere/xe5/mobdevsetup/ios/en/installing_the_commandline_tools.html)
 * Linux: You will need g++ and OpenGL development libraries. If they are not already installed, run ```sudo apt-get install build-essential libgl1-mesa-dev```.
 
