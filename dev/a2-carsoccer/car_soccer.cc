@@ -49,7 +49,7 @@ void CarSoccer::UpdateSimulation(double timeStep) {
 void CarSoccer::InitOpenGL() {
     // Set up the camera in a good position to see the entire field
     projMatrix_ = Matrix4::Perspective(60, aspect_ratio(), 1, 1000);
-    modelMatrix_ = Matrix4::LookAt(Point3(0,60,70), Point3(0,0,10), Vector3(0,1,0));
+    viewMatrix_ = Matrix4::LookAt(Point3(0,60,70), Point3(0,0,10), Vector3(0,1,0));
  
     // Set a background color for the screen
     glClearColor(0.8,0.8,0.8, 1);
