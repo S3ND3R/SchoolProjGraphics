@@ -44,7 +44,7 @@ After the ```git commit``` command, you may get the warning "Your branch is base
 
 #### 6) Configure
 
-Please see the [course slides on building with CMake](https://canvas.umn.edu/courses/106184/modules/items/1343390) but remember that you can only start ```cmake-gui``` from the command line if you installed the CMake Command Line Tools in Step 1.  If not, then just run CMake from the Windows menu or Applications folder on Mac.
+Please see the [course slides on building with CMake](https://canvas.umn.edu/courses/158203/files/10944841?module_item_id=3340126) but remember that you can only start ```cmake-gui``` from the command line if you installed the CMake Command Line Tools in Step 1.  If not, then just run CMake from the Windows menu or Applications folder on Mac.
 
 For Configuring:
 * Remember the very important step noted in the slides for changing your CMAKE_INSTALL_PREFIX to point to the root of your repo -- this is critical for installing MinGfx to the correct place.
