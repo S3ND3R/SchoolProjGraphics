@@ -17,7 +17,20 @@ It is extremely helpful to outline the steps you took in the email. This helps u
 
 * CSE Labs: These already have a recent version of cmake installed.
 * Windows and OSX: [Download/install the binaries](https://cmake.org/download) (**not** the source code)  This will install a new application in your Start menu for Windows or in your Applications folder on Mac.  You can run it as usual by double-clicking it, and you can always do this if you prefer.  However, you may prefer to install CMake so that you can run it from the command line as shown in class.  To do this, open CMake by double-clicking, then go to the "Tools" menu and select "How to Install for Command Line Use".  Then follow the instructions there.
-* Linux: You should [Download/install linux the most recent binaries](https://cmake.org/download). The tar.gz available has cmake-gui in the bin/ directory, which you can run directly.
+* Linux: There are two ways:
+    1. [Download/install the most recent Linux binaries](https://cmake.org/download). There is a shell script and a tar.gz that you can download. The script, when run, will extract the tar file (which it  contains! If you look at the file, you'll see a bunch of crazy characters that is the compressed binaries themselves). Or you can download and unpack the tar.gz yourself. The tar.gz available has cmake-gui in the bin/ directory. There are different ways to run the cmake-gui:
+        1. Directly from the bin/ directory. It is simply an executable and can be run from the command line or from the file explorer.
+        2. As a bash command (like how it is shown in the slides). To add to the level of options, there are two ways to accomplish this as well:
+            1. Add the bin/ directory containing cmake-gui to your PATH environment variable. This is explained well in this article [How to Add a Directory to PATH in Linux](https://linuxize.com/post/how-to-add-directory-to-path-in-linux/).
+            2. Create a symlink from the cmake-gui executable to your bin as such:
+            ```
+            $ sudo ln -s /path/to/bin/containing/cmake-gui /usr/local/bin/
+            ```
+    2. Run the following installation commands in order to let Linux set up your path so that both cmake and cmake-gui are added as bash commands.
+    ```
+    $ sudo apt install cmake
+    $ sudo apt-get install cmake-qt-gui     # to get cmake-gui (this might also install cmake?)
+    ```
 
 #### 2) Clone your repository for this class.  *Put it inside a directory path on your computer that does not include any spaces!*   On Windows, we recommend using Git-bash rather than the built-in Windows Command Prompt; Git-bash gets installed on Windows when you install Git.  On OSX, you can use Terminal.  On Linux, use your favorite shell.   Then, type the following command.
 
@@ -49,6 +62,7 @@ Please see the [course slides on building with CMake](https://canvas.umn.edu/cou
 For Configuring:
 * Remember the very important step noted in the slides for changing your CMAKE_INSTALL_PREFIX to point to the root of your repo -- this is critical for installing MinGfx to the correct place.
 * If you have previously installed the nanogui or nanovg libraries on your computer for use with another course, like CSci-3081W, or for some other reason, CMake will find it and will skip downloading, building, and installing that dependency of MinGfx.  But, some students have had trouble with this, likely because when they installed nanogui previously, it was sufficient to just install the binaries, but for MinGfx, we need to have the header files for the library too.  The way around this is to force CMake to "auto build" NanoGUI even if it finds it, and you can do this by making sure the box next to AUTOBUILD_NANOGUI is checked in CMake before you run configure for the second time.
+* If you are on Linux and you run into this error about the RandR library: `The RandR library and headers were not found`, you can try running `sudo apt-get install xorg-dev libglu1-mesa-dev` which will install `xrandr-dev` which contains the correct files.
 
 #### 7) Build, and install
 
@@ -93,9 +107,9 @@ If you compiled MinGfx correctly, an executable called mingfx-test-gui-plus-open
 	cd /path/to/repo-[x500]
 	git pull upstream support-code
 	
-After you have updated from shared-upstream, re-do the "For Building and Installing" part of section 6 above. You do not need to run cmake's configure or generate on MinGfx again.
+After you have updated from shared-upstream, re-do the "For Building and Installing" part of section 7 above. You do not need to run cmake's configure or generate on MinGfx again. You already configured and generated for your machine, so you're good to go!
 
-Please note that the support-code will change throughout the semester. Be sure to get in the habit of pullling from the support code repository!
+Please note that the support-code will change throughout the semester. Be sure to get in the habit of pulling from the support code repository!
 
 #### 2) Exercise: Build and run the gfxtest code
 
