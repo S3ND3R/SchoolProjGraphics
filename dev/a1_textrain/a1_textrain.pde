@@ -12,10 +12,34 @@ Movie mov;
 PImage inputImage;
 boolean inputMethodSelected = false;
 
+// Global variables for implenting falling text
+String poem = "a drop fell on the apple tree another on the roof a half a dozen kissed the eaves and made the gables laugh";
+int numDrops = 10;
+Letter[] letters = new Letter[numDrops];
+PFont f;
+int lastDrop;
+final int MAX_LETTERS = 50;
+final int RAIN_DUR = 2000;
+final int VELOCITY = 10;
+
+
+
+//Global variable for implementing text object interaction
+int threshold = 130;
+final float MAX_THRESH = 250;
+
+//debug toggle
+int debug_mode = 0;
+int startTime;
+final int DISPLAY_DUR = 2000;
+
 
 void setup() {
   size(1280, 720);  
   inputImage = createImage(width, height, RGB);
+  f = loadFont("DejaVuSansMono-Bold-20.vlw");
+  initializeLetters(poem);
+  
 }
 
 
@@ -53,13 +77,113 @@ void draw() {
   // Fill in your code to implement the rest of TextRain here..
 
   // Tip: This code draws the current input image to the screen
-  set(0, 0, inputImage);
-
-
-
+  
+  // flip the captured image so that it is mirrored and apply appropriate filter
+  pushMatrix();
+  translate(inputImage.width,0);
+  scale(-1,1);
+  if (debug_mode == 1) {
+    float threshVal = threshold / MAX_THRESH;
+    inputImage.filter(THRESHOLD, threshVal);
+  } else {
+    inputImage.filter(GRAY);
+  }
+  image(inputImage,0,0);
+  popMatrix();
+    
+  textFont(f);
+  fill(0);
+  
+  // display the threshold value after the up or down key has been pressed
+  if (millis() - startTime < DISPLAY_DUR) {
+    text(threshold, 20, 20);
+  }
+  
+  
+  addLetter(poem);
+  for (int i = 0; i < letters.length; i++) {
+    letters[i].update();
+    letters[i].drawLetter();
+  }
 }
 
 
+// the Letter class used to track letter locations on the screen
+class Letter{
+  char letter;
+  int yPos, xPos, speed;
+  
+  Letter(char c, int y, int x, int s) {
+    letter = c;
+    yPos = y;
+    xPos = x;
+    speed = s;
+  }
+  
+  void display() {
+    println("letter (" + letter + "), Y (" + yPos + "), X (" + xPos + ")");
+    println();
+  }
+  
+  void update() {
+    if (yPos < height - 10) {
+      for (int i = 0; i < speed; i++){
+        yPos ++;
+        color cl = get(xPos, yPos);
+        float bright = brightness(cl);
+        if (bright > threshold) {
+          fill(#39ff14);
+        } else {
+          fill (#1b03a3);
+          while(bright < threshold && yPos > 0) {
+            yPos --;
+            cl = get(xPos, yPos);
+            bright = brightness(cl); 
+          }
+        }
+      }
+    } else {
+      yPos = 0;
+    }
+  }
+  
+  void drawLetter() {
+    text(letter, xPos, yPos);
+  }
+   
+} // End Letter
+
+//Initializes the letter array from a passed string
+void initializeLetters(String str) {
+    for (int i = 0; i < letters.length; i++) {
+      char character = str.charAt(int(random(str.length())));
+      while (character < 'a' || character > 'z'){
+        character = str.charAt(int(random(str.length())));
+      }
+      int speed = int(random(1,10));
+      int xLoc = int(random(width - 5));
+      int yLoc = 0;
+      letters[i] = new Letter(character, yLoc, xLoc, speed);
+    }
+  
+}
+
+//adds a single random new letter from the passed string
+void addLetter(String str) {
+  if (numDrops < MAX_LETTERS && millis() - lastDrop > RAIN_DUR) {
+    char character = str.charAt(int(random(str.length())));
+    while (character < 'a' || character > 'z'){
+      character = str.charAt(int(random(str.length())));
+    }
+    int speed = int(random(1,10));
+    int xLoc = int(random(width - 5));
+    int yLoc = 0;
+    Letter l = new Letter(character, yLoc, xLoc, speed);
+    letters = (Letter[])append(letters, l);
+    lastDrop = millis();
+    numDrops++;
+  }
+}
 
 void keyPressed() {
   
@@ -91,13 +215,26 @@ void keyPressed() {
   if (key == CODED) {
     if (keyCode == UP) {
       // up arrow key pressed
+      if (threshold < 255) {
+        threshold++;
+      }
+      startTime = millis();
     }
     else if (keyCode == DOWN) {
       // down arrow key pressed
+      if (threshold > 0) {
+        threshold--;
+      }
+      startTime = millis();
     }
   }
   else if (key == ' ') {
     // space bar pressed
+    if (debug_mode == 0) {
+      debug_mode = 1;
+    } else {
+      debug_mode = 0;
+    }
   } 
   
 }
