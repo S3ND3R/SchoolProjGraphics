@@ -13,7 +13,7 @@ PImage inputImage;
 boolean inputMethodSelected = false;
 
 // Global variables for implenting falling text
-String poem = "i hear leaves drinking rain i hear rich leaves on top giving the poor beneath grop after drop" + 
+String poem = "i hear leaves drinking rain i hear rich leaves on top giving the poor beneath grop after drop" +
 "tis a sweet noise to hear these green leaves drinking near and when the sun comes out, after this rain shall stop" +
 "a wondrous light will fill each dark round drop i hope the sun shines bright twill be a lovely sight";
 int numDrops = 10;
@@ -22,8 +22,6 @@ PFont f;
 int lastDrop;
 final int MAX_LETTERS = 80;
 final int RAIN_DUR = 2000;
-final int VELOCITY = 100;
-
 
 
 //Global variable for implementing text object interaction
@@ -37,11 +35,11 @@ final int DISPLAY_DUR = 2000;
 
 
 void setup() {
-  size(1280, 720);  
+  size(1280, 720);
   inputImage = createImage(width, height, RGB);
   f = loadFont("DejaVuSansMono-Bold-20.vlw");
   initializeLetters(poem);
-  
+
 }
 
 
@@ -52,7 +50,7 @@ void draw() {
     cameras = Capture.list();
     int y=40;
     text("O: Offline mode, test with TextRainInput.mov movie file instead of live camera feed.", 20, y);
-    y += 40; 
+    y += 40;
     for (int i = 0; i < min(9,cameras.length); i++) {
       text(i+1 + ": " + cameras[i], 20, y);
       y += 40;
@@ -63,9 +61,9 @@ void draw() {
 
   // This part of the draw loop gets called after the input selection screen, during normal execution of the program.
 
-  
+
   // STEP 1.  Load an image, either from a movie file or from a live camera feed. Store the result in the inputImage variable
-  
+
   if ((cam != null) && (cam.available())) {
     cam.read();
     inputImage.copy(cam, 0,0,cam.width,cam.height, 0,0,inputImage.width,inputImage.height);
@@ -79,7 +77,7 @@ void draw() {
   // Fill in your code to implement the rest of TextRain here..
 
   // Tip: This code draws the current input image to the screen
-  
+
   // flip the captured image so that it is mirrored and apply appropriate filter
   pushMatrix();
   translate(inputImage.width,0);
@@ -92,16 +90,16 @@ void draw() {
   }
   image(inputImage,0,0);
   popMatrix();
-    
+
   textFont(f);
   fill(0);
-  
+
   // display the threshold value after the up or down key has been pressed
   if (millis() - startTime < DISPLAY_DUR) {
     text(threshold, 20, 20);
   }
-  
-  
+
+
   addLetter(poem);
   for (int i = 0; i < letters.length; i++) {
     letters[i].update();
@@ -116,19 +114,19 @@ class Letter{
   int yPos, xPos, speed;
   int lastLoop = 0;
   boolean updated = false;
-  
+
   Letter(char c, int y, int x, int s) {
     letter = c;
     yPos = y;
     xPos = x;
     speed = s;
   }
-  
+
   void display() {
     println("letter (" + letter + "), Y (" + yPos + "), X (" + xPos + ")");
     println();
   }
-  
+
   void update() {
     if (yPos < height - 10) {
       if (millis() - lastLoop > speed) {
@@ -144,18 +142,18 @@ class Letter{
         while(bright < threshold && yPos > 0) {
           yPos --;
           cl = get(xPos, yPos);
-          bright = brightness(cl); 
+          bright = brightness(cl);
         }
       }
     } else {
       yPos = 0;
     }
   }
-  
+
   void drawLetter() {
     text(letter, xPos, yPos);
   }
-   
+
 } // End Letter
 
 //Initializes the letter array from a passed string
@@ -170,7 +168,7 @@ void initializeLetters(String str) {
       int yLoc = 0;
       letters[i] = new Letter(character, yLoc, xLoc, speed);
     }
-  
+
 }
 
 //adds a single random new letter from the passed string
@@ -211,10 +209,10 @@ void addLetter(String str) {
 }
 
 void keyPressed() {
-  
+
   if (!inputMethodSelected) {
     // If we haven't yet selected the input method, then check for 0 to 9 keypresses to select from the input menu
-    if ((key >= '0') && (key <= '9')) { 
+    if ((key >= '0') && (key <= '9')) {
       int input = key - '0';
       if (input == 0) {
         println("Offline mode selected.");
@@ -223,7 +221,7 @@ void keyPressed() {
         inputMethodSelected = true;
       }
       else if ((input >= 1) && (input <= 9)) {
-        println("Camera " + input + " selected.");           
+        println("Camera " + input + " selected.");
         // The camera can be initialized directly using an element from the array returned by list():
         cam = new Capture(this, cameras[input-1]);
         cam.start();
@@ -236,7 +234,7 @@ void keyPressed() {
 
   // This part of the keyPressed routine gets called after the input selection screen during normal execution of the program
   // Fill in your code to handle keypresses here..
-  
+
   if (key == CODED) {
     if (keyCode == UP) {
       // up arrow key pressed
@@ -260,6 +258,6 @@ void keyPressed() {
     } else {
       debug_mode = 0;
     }
-  } 
-  
+  }
+
 }
