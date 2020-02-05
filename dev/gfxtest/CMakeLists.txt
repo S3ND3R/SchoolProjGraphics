@@ -168,12 +168,12 @@ h2("Configuring Install Target")
 # The install locations are relative to the CMAKE_INSTALL_PREFIX variable
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
-install(
-    DIRECTORY data/
-    DESTINATION ${DATA_DIR_INSTALL}
-)
-
-install(
-    DIRECTORY shaders/
-    DESTINATION ${SHADERS_DIR_INSTALL}
-)
+#install(
+#    DIRECTORY data/
+#    DESTINATION ${DATA_DIR_INSTALL}
+#)
+#
+#install(
+#    DIRECTORY shaders/
+#    DESTINATION ${SHADERS_DIR_INSTALL}
+#)
