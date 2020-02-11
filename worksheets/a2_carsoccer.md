@@ -24,7 +24,7 @@ class Vector3  {
     float x;
     float y;
     float z;
-    
+
     // returns the length (i.e., magnitude) of the vector
     float Length() {
         return sqrt(x*x + y*y + z*z);
@@ -39,30 +39,30 @@ class Vector3  {
  * if we have a point A (Coffman Union) and we add a vector (direction
  * and magnitude) to this, we arrive at a new point B (e.g., Murphy Hall).
  * Conceptually, a point + a vector = a new point.  Mathematically, it
- * does not make sense to add two points, but it does make sense to 
- * subtract two points.  The "difference" between the Murphy and Coffman 
+ * does not make sense to add two points, but it does make sense to
+ * subtract two points.  The "difference" between the Murphy and Coffman
  * points is a vector that tells us the direction and magnitude we would
  * need to walk from Coffman to get to Murphy.  Here's how we can write
  * that in code using Point3, Vector3, and operators like + and -.
  *
  *   Point3 murphy = Point3(5, 8, 0);
  *   Point3 coffman = Point3(4, 6, 0);
- *   Vector3 toMurphy = murphy - coffman; 
+ *   Vector3 toMurphy = murphy - coffman;
  *
  *   // or, if we were given coffman and toMurphy we could find
  *   // the point "murphy" by starting at point "coffman" and adding
  *   // the vector "toMurphy".
- *   Point3 murphy2 = coffman + toMurhpy; 
+ *   Point3 murphy2 = coffman + toMurhpy;
  *
  * The code that defines these opertors looks something like this:
 */
 
 // a point + a vector = a new point
-Point3 operator+(Point3 p, Vector3 v) { 
-   return Point3(p.x + v.x, p.y + v.y, p.z + v.z); 
+Point3 operator+(Point3 p, Vector3 v) {
+   return Point3(p.x + v.x, p.y + v.y, p.z + v.z);
 }
 
-// a point - a point = a vector 
+// a point - a point = a vector
 // the dir and magnitude needed to go from point point B to point A
 Vector3 operator-(Point3 A, Point3 B) {
     return Vector3(A.x - B.x, A.y - B.y, A.z - B.z);
@@ -107,7 +107,7 @@ Sphere s = Sphere {
     radius: 5.0,
 };
 
-s.position = /* --- Fill in the next frame position computation here --- */
+s.position = s.position + velocity * dt;
 ```
 
 
@@ -122,7 +122,7 @@ write pseudocode to determine whether or not two spheres are intersecting
 ```
 bool sphereIntersection(Sphere s1, Sphere s2) {
     /* --- Fill in your sphere intersection code here --- */
-    
+
 
 }
 ```
