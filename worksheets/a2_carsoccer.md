@@ -121,9 +121,14 @@ write pseudocode to determine whether or not two spheres are intersecting
 
 ```
 bool sphereIntersection(Sphere s1, Sphere s2) {
-    /* --- Fill in your sphere intersection code here --- */
+  float safeDist = s1.radius + s2.radius;
+  Vector3 curDistVect = s1.position - s2.position;
+  float curDist = curDistVect.Length();
 
-
+  if (curDist < safeDist) {
+    return True;
+  }
+  return False;
 }
 ```
 
@@ -149,8 +154,8 @@ Sphere s3 = Sphere {
 };
 
 print(sphereIntersection(s1, s2));
-/* --- Fill in expected output (True or False) --- */
+/* --- expected output is False --- */
 
 print(sphereIntersection(s1, s3));
-/* --- Fill in expected output (True or False) --- */
+/* --- expected output is True --- */
 ```
