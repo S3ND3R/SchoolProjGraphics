@@ -69,7 +69,7 @@ void AngryVectors::InitNanoGUI() {
 void AngryVectors::InitOpenGL() {
     // Set up the camera in a good position to see the entire scene
     proj_matrix_ = Matrix4::Perspective(60, aspect_ratio(), 0.01, 100);
-    view_matrix_ = Matrix4::LookAt(Point3(0,2,15), Point3(0,0,0), Vector3(0,1,0));
+    view_matrix_ = Matrix4::LookAt(Point3(0,4,40), Point3(0,0,0), Vector3(0,1,0));
     glClearColor(0.2, 0.6, 1.0, 1);
 }
 
@@ -96,10 +96,13 @@ void AngryVectors::DrawUsingOpenGL() {
 
     // bird
     Point3 bird_pos = CalcBirdPos(time_);
-    Vector3 bird_vel = CalcBirdVel(time_) * 5;
+    Vector3 bird_vel = CalcBirdVel(time_);
+    float mag = bird_vel.Length();
+    bird_vel = bird_vel * (mag * 1.5);
     Matrix4 bird_matrix = Matrix4::Translation(bird_pos - Point3::Origin());
+    Matrix4 identity;
     quick_shapes_.DrawSphere(bird_matrix, view_matrix_, proj_matrix_, Color(1,0,0));
-    quick_shapes_.DrawArrow(bird_matrix, view_matrix_, proj_matrix_, Color(1,1,0), bird_pos, bird_vel, 0.5);
+    quick_shapes_.DrawArrow(identity, view_matrix_, proj_matrix_, Color(1,0,0), bird_pos, bird_vel, 0.1);
 
 
 
@@ -108,8 +111,8 @@ void AngryVectors::DrawUsingOpenGL() {
     // this is useful to be able to see where the origin is and the scale.  The
     // axes are drawn at (0,0,0), and each arrow is 1 unit long.  The red axis is X,
     // green is Y, and blue is Z.
-    Matrix4 identity;
-    quick_shapes_.DrawAxes(identity, view_matrix_, proj_matrix_);
+    Matrix4 identity_m;
+    quick_shapes_.DrawAxes(identity_m, view_matrix_, proj_matrix_);
 
 
     // TODO: make sure bird velocity makes sense. (hint, hint)
