@@ -33,7 +33,7 @@ Vector2 CarSoccer::joystick_direction() {
 
 void CarSoccer::OnSpecialKeyDown(int key, int scancode, int modifiers) {
     if (key == GLFW_KEY_SPACE) {
-        // Here's where you could call some form of launch_ball();
+      ball_.Reset();
     }
 }
 
@@ -43,9 +43,15 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     // car and ball as needed and checking for collisions.  Filling this routine
     // in is the main part of the assignment.
     Vector2 dir = joystick_direction();
-    Vector3 vel = Vector3(dir[0], 0.0, dir[1]);
-    Point3 newPos = car_.position() + vel * timeStep;
+    Vector3 vel = Vector3( dir[0], 0.0, -dir[1]);
+    Point3 newPos = car_.position() + vel * 2 * timeStep;
     car_.set_position(newPos);
+
+    // calculating ball position
+    Vector3 newVel = ball_.velocity() + gravity_ * timeStep;
+    ball_.set_velocity(newVel);
+    Point3 newBalPos = ball_.position() + ball_.velocity() * timeStep;
+    ball_.set_position(newBalPos);
 
 }
 
@@ -75,11 +81,6 @@ void CarSoccer::DrawUsingOpenGL() {
     M = Matrix4::Translation(Vector3(0,-0.2,0)) * Matrix4::Scale(Vector3(40, 1, 50));
     quickShapes_.DrawSquare(modelMatrix_ * M, viewMatrix_, projMatrix_, Color(1,1,1), fieldTex_);
 
-    // Draw the field boundary
-
-    //Draw the goals
-
-    
     // Draw the car
     Color carcol(0.8, 0.2, 0.2);
     Matrix4 Mcar =
@@ -108,7 +109,25 @@ void CarSoccer::DrawUsingOpenGL() {
         Matrix4::RotationX(90);
     quickShapes_.DrawSphere(modelMatrix_ * Mshadow, viewMatrix_, projMatrix_, shadowcol);
 
+    // Draw the field boundary
+    Color cBound = Color(1, 1, 1);
+    std::vector<Point3> strip;
+    strip.push_back(Point3(-40, 0, 50));
+    strip.push_back(Point3(-40, 35, 50));
+    strip.push_back(Point3(40, 35, 50));
+    strip.push_back(Point3(40, 0, 50));
+    strip.push_back(Point3(40, 35, 50));
+    strip.push_back(Point3(40, 35, -50));
+    strip.push_back(Point3(40, 0, -50));
+    strip.push_back(Point3(40, 35, -50));
+    strip.push_back(Point3(-40, 35, -50));
+    strip.push_back(Point3(-40, 0, -50));
+    strip.push_back(Point3(-40, 35, -50));
+    strip.push_back(Point3(-40, 35, 50));
+    quickShapes_.DrawLines(modelMatrix_, viewMatrix_, projMatrix_, cBound, strip, QuickShapes::LinesType::LINE_STRIP, 0.1);
 
-    // You should add drawing the goals and the boundary of the playing area
-    // using quickShapes_.DrawLines()
+    //Draw the goals
+
+    // Debugging code that draws arrows for the velocity
+    quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(1,0,0), ball_.position(), ball_.velocity(), 0.1);
 }
