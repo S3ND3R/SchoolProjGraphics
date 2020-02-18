@@ -43,16 +43,23 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     // car and ball as needed and checking for collisions.  Filling this routine
     // in is the main part of the assignment.
     Vector2 dir = joystick_direction();
-    Vector3 vel = Vector3( dir[0], 0.0, -dir[1]);
-    Point3 newPos = car_.position() + vel * 2 * timeStep;
+    car_.set_speed(Vector3( dir[0], 0.0, -dir[1]));
+    Point3 newPos = car_.position() + car_.speed() * 2 * timeStep;
     car_.set_position(newPos);
+    int colLoc = collision(car_);
+    if (colLoc > 0) {
+      car_.set_speed(reflect(car_, colLoc));
+    }
 
     // calculating ball position
     Vector3 newVel = ball_.velocity() + gravity_ * timeStep;
     ball_.set_velocity(newVel);
     Point3 newBalPos = ball_.position() + ball_.velocity() * timeStep;
     ball_.set_position(newBalPos);
-
+    colLoc = collision(ball_);
+    if (colLoc > 0) {
+      ball_.set_velocity(reflect(&ball_, colLoc));
+    }
 }
 
 
@@ -112,22 +119,146 @@ void CarSoccer::DrawUsingOpenGL() {
     // Draw the field boundary
     Color cBound = Color(1, 1, 1);
     std::vector<Point3> strip;
-    strip.push_back(Point3(-40, 0, 50));
-    strip.push_back(Point3(-40, 35, 50));
-    strip.push_back(Point3(40, 35, 50));
-    strip.push_back(Point3(40, 0, 50));
-    strip.push_back(Point3(40, 35, 50));
-    strip.push_back(Point3(40, 35, -50));
-    strip.push_back(Point3(40, 0, -50));
-    strip.push_back(Point3(40, 35, -50));
-    strip.push_back(Point3(-40, 35, -50));
-    strip.push_back(Point3(-40, 0, -50));
-    strip.push_back(Point3(-40, 35, -50));
-    strip.push_back(Point3(-40, 35, 50));
+    strip.push_back(Point3(minX_, minY_, maxZ_));
+    strip.push_back(Point3(minX_, maxY_, maxZ_));
+    strip.push_back(Point3(maxX_, maxY_, maxZ_));
+    strip.push_back(Point3(maxX_, minY_, maxZ_));
+    strip.push_back(Point3(maxX_, maxY_, maxZ_));
+    strip.push_back(Point3(maxX_, maxY_, minZ_));
+    strip.push_back(Point3(maxX_, minY_, minZ_));
+    strip.push_back(Point3(maxX_, maxY_, minZ_));
+    strip.push_back(Point3(minX_, maxY_, minZ_));
+    strip.push_back(Point3(minX_, minY_, minZ_));
+    strip.push_back(Point3(minX_, maxY_, minZ_));
+    strip.push_back(Point3(minX_, maxY_, maxZ_));
     quickShapes_.DrawLines(modelMatrix_, viewMatrix_, projMatrix_, cBound, strip, QuickShapes::LinesType::LINE_STRIP, 0.1);
 
     //Draw the goals
 
     // Debugging code that draws arrows for the velocity
     quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(1,0,0), ball_.position(), ball_.velocity(), 0.1);
+    quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(0,1,0), car_.position(), car_.speed(), 0.1);
+
+}
+
+int CarSoccer::collision(Ball b) {
+  Point3 bPos = b.position();
+  float x = bPos[0] + b.radius();
+  float y = bPos[1] + b.radius();
+  float z = bPos[2] + b.radius();
+
+  if (x <= minX_ || x >= maxX_) {
+    return 1;
+  } else if (y <= minY_ || y >= maxY_) {
+    return 2;
+  } else if (z <= minZ_ || z >= maxZ_) {
+    return 3;
+  }
+  return 0;
+}
+
+int CarSoccer::collision(Car c) {
+  Point3 cPos = c.position();
+  float x = cPos[0] + c.collision_radius();
+  float y = cPos[1] + c.collision_radius();
+  float z = cPos[2] + c.collision_radius();
+
+  if (x <= minX_ || x >= maxX_) {
+    return 1;
+  } else if (y <= minY_ || y >= maxY_) {
+    return 2;
+  } else if (z <= minZ_ || z >= maxZ_) {
+    return 3;
+  }
+  return 0;
+}
+
+Vector3 CarSoccer::reflect(Ball *bptr, int n) {
+  float x = bptr->position()[0] + bptr->radius();
+  float y = bptr->position()[1] + bptr->radius();
+  float z = bptr->position()[2] + bptr->radius();
+  Vector3 d = bptr->velocity();
+  Vector3 reflect = bptr->velocity();
+  float dot;
+
+  if (n == 1) {
+    if (x >= maxX_) {
+      bptr->position()[0] = maxX_ - bptr->radius();
+      Vector3 xNormMax = Vector3(-1,0,0);
+      dot = d.Dot(xNormMax);
+      reflect = d - (2 * xNormMax * dot);
+    } else {
+      bptr->position()[0] = minX_ + bptr->radius();
+      Vector3 xNormMin = Vector3(1,0,0);
+      dot = d.Dot(xNormMin);
+      reflect = d - (2 * xNormMin * dot);
+    }
+  } else if (n == 2) {
+    if (y >= maxY_) {
+      bptr->position()[1] = maxY_ - bptr->radius();
+      Vector3 yNormMax = Vector3(0,-1,0);
+      dot = d.Dot(yNormMax);
+      reflect = d - (2 * yNormMax * dot);
+    } else {
+      bptr->position()[1] = minY_ + bptr->radius();
+      Vector3 yNormMin = Vector3(0,1,0);
+      dot = d.Dot(yNormMin);
+      reflect = d - (2 * yNormMin * dot);
+    }
+  } else if (n == 3) {
+    if (z >= maxZ_) {
+      bptr->position()[2] = maxZ_ - bptr->radius();
+      Vector3 zNormMax = Vector3(0,0,-1);
+      dot = d.Dot(zNormMax);
+      reflect = d - (2 * zNormMax * dot);
+    } else {
+      bptr->position()[2] = minZ_ + bptr->radius();
+      Vector3 zNormMin = Vector3(0,0,1);
+      dot = d.Dot(zNormMin);
+      reflect = d - (2 * zNormMin * dot);
+    }
+  }
+  return reflect;
+}
+
+Vector3 CarSoccer::reflect(Car c, int n) {
+  float x = c.position()[0] + c.collision_radius();
+  float y = c.position()[1] + c.collision_radius();
+  float z = c.position()[2] + c.collision_radius();
+  Vector3 d = c.speed();
+  Vector3 reflect = c.speed();
+  float dot;
+
+  if (n == 1) {
+    if (x >= maxX_) {
+      Vector3 xNormMax = Vector3(-1,0,0);
+      dot = d.Dot(xNormMax);
+      reflect = d - (2 * xNormMax * dot);
+    } else {
+      Vector3 xNormMin = Vector3(1,0,0);
+      dot = d.Dot(xNormMin);
+      reflect = d - (2 * xNormMin * dot);
+    }
+  } else if (n == 2) {
+    if (y >= maxY_) {
+      Vector3 yNormMax = Vector3(0,-1,0);
+      dot = d.Dot(yNormMax);
+      reflect = d - (2 * yNormMax * dot);
+    } else {
+      Vector3 yNormMin = Vector3(0,1,0);
+      dot = d.Dot(yNormMin);
+      reflect = d - (2 * yNormMin * dot);
+    }
+  } else if (n == 3) {
+    if (z >= maxZ_) {
+      Vector3 zNormMax = Vector3(0,0,-1);
+      dot = d.Dot(zNormMax);
+      reflect = d - (2 * zNormMax * dot);
+    } else {
+      Vector3 zNormMin = Vector3(0,0,1);
+      dot = d.Dot(zNormMin);
+      reflect = d - (2 * zNormMin * dot);
+    }
+  }
+  return reflect;
 }

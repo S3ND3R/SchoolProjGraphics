@@ -9,7 +9,7 @@
 /// Small data structure for a car
 class Car {
 public:
-    
+
     /// The constructor sets the static properties of the car, like its size,
     /// and then calls Reset() to reset the position, velocity, and any other
     /// dynamic variables that change during game play.
@@ -25,25 +25,30 @@ public:
     void Reset() {
         position_ = Point3(0, size_[1]/2, 45);
         angle_ = 0.0f;
+        speed_ = Vector3(0,0,0);
     }
-    
+
     float collision_radius() { return collision_radius_; }
-    
+
     Vector3 size() { return size_; }
-    
+
     Point3 position() { return position_; }
     void set_position(const Point3 &p) { position_ = p; }
-    
+
     float angle() { return angle_; }
     void set_angle(float angle) { angle_ = angle; }
-    
+
+    Vector3 speed() { return speed_; }
+    void set_speed(Vector3 speed) { speed_ = speed; }
+
 private:
     // You will probably need to store some additional data here, e.g., speed.
-    
+
     Vector3 size_;
     float collision_radius_;
     Point3 position_;
     float angle_;
+    Vector3 speed_;
 };
 
 #endif

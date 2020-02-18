@@ -39,6 +39,13 @@ public:
     Vector2 joystick_direction();
 
     // Feel free to add more functions here as needed.
+    int collision(Ball b);
+
+    Vector3 reflect(Ball *bptr, int n);
+
+    int collision(Car c);
+
+    Vector3 reflect(Car c, int n);
 
 
 
@@ -54,6 +61,14 @@ private:
     Ball ball_;
 
     Vector3 gravity_ = Vector3(0, -9.8, 0);
+
+    float maxX_ = 40;
+    float minX_ = -40;
+    float maxY_ = 35;
+    float minY_ = 0;
+    float maxZ_ = 50;
+    float minZ_ = -50;
+
 
     // Support for drawing some simple shapes:
     QuickShapes quickShapes_;
