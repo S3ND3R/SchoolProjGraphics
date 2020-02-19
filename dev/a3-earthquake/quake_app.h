@@ -5,6 +5,7 @@
 #define QUAKEAPP_H_
 
 #include <mingfx.h>
+using namespace mingfx;
 
 #include "earthquake_database.h"
 #include "earth.h"

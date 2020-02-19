@@ -5,6 +5,7 @@
 #define EARTH_H_
 
 #include <mingfx.h>
+using namespace mingfx;
 
 
 /** This class can draw a textured earth as either a plane or a sphere or
