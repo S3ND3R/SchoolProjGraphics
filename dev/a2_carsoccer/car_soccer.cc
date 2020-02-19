@@ -43,12 +43,12 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     // car and ball as needed and checking for collisions.  Filling this routine
     // in is the main part of the assignment.
     Vector2 dir = joystick_direction();
-    car_.set_speed(Vector3( dir[0], 0.0, -dir[1]));
-    Point3 newPos = car_.position() + car_.speed() * 2 * timeStep;
+    car_.set_velocity(Vector3( dir[0], 0.0, -dir[1]));
+    Point3 newPos = car_.position() + car_.velocity() * timeStep;
     car_.set_position(newPos);
     int colLoc = collision(car_);
     if (colLoc > 0) {
-      car_.set_speed(reflect(car_, colLoc));
+      car_.set_velocity(reflect(&car_, colLoc));
     }
 
     // calculating ball position
@@ -137,40 +137,43 @@ void CarSoccer::DrawUsingOpenGL() {
 
     // Debugging code that draws arrows for the velocity
     quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(1,0,0), ball_.position(), ball_.velocity(), 0.1);
-    quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(0,1,0), car_.position(), car_.speed(), 0.1);
+    quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(0,1,0), car_.position(), car_.velocity(), 0.1);
 
 }
 
 int CarSoccer::collision(Ball b) {
-  Point3 bPos = b.position();
-  float x = bPos[0] + b.radius();
-  float y = bPos[1] + b.radius();
-  float z = bPos[2] + b.radius();
+  const Point3 bPos = b.position();
+  const float x = bPos[0];
+  const float y = bPos[1];
+  const float z = bPos[2];
+  const float r = b.radius();
 
-  if (x <= minX_ || x >= maxX_) {
+  if ( x - r <= minX_ || x + r >= maxX_ ) {
     return 1;
-  } else if (y <= minY_ || y >= maxY_) {
+  } else if (y - r <= minY_ || y + r >= maxY_) {
     return 2;
-  } else if (z <= minZ_ || z >= maxZ_) {
+  } else if (z - r <= minZ_ || z + r >= maxZ_) {
     return 3;
   }
   return 0;
 }
 
 int CarSoccer::collision(Car c) {
-  Point3 cPos = c.position();
-  float x = cPos[0] + c.collision_radius();
-  float y = cPos[1] + c.collision_radius();
-  float z = cPos[2] + c.collision_radius();
+  const Point3 cPos = c.position();
+  const float x = cPos[0];
+  const float y = cPos[1];
+  const float z = cPos[2];
+  const float r = c.collision_radius();
 
-  if (x <= minX_ || x >= maxX_) {
+  if ( x - r <= minX_ || x + r >= maxX_ ) {
     return 1;
-  } else if (y <= minY_ || y >= maxY_) {
+  } else if (y - r <= minY_ || y + r >= maxY_) {
     return 2;
-  } else if (z <= minZ_ || z >= maxZ_) {
+  } else if (z - r <= minZ_ || z + r >= maxZ_) {
     return 3;
   }
   return 0;
+
 }
 
 Vector3 CarSoccer::reflect(Ball *bptr, int n) {
@@ -221,16 +224,20 @@ Vector3 CarSoccer::reflect(Ball *bptr, int n) {
   return reflect;
 }
 
-Vector3 CarSoccer::reflect(Car c, int n) {
-  float x = c.position()[0] + c.collision_radius();
-  float y = c.position()[1] + c.collision_radius();
-  float z = c.position()[2] + c.collision_radius();
-  Vector3 d = c.speed();
-  Vector3 reflect = c.speed();
+Vector3 CarSoccer::reflect(Car *cptr, int n) {
+  float x = cptr->position()[0];
+  float y = cptr->position()[1];
+  float z = cptr->position()[2];
+  float r = cptr->collision_radius();
+  Vector3 d = cptr->velocity();
+  Vector3 reflect = cptr->velocity();
   float dot;
 
   if (n == 1) {
-    if (x >= maxX_) {
+    if (x + r >= maxX_) {
+      float over = (x + r) - maxX_;
+
+      cptr->set_position(Point3(maxX_ - (over + 3),y,z));
       Vector3 xNormMax = Vector3(-1,0,0);
       dot = d.Dot(xNormMax);
       reflect = d - (2 * xNormMax * dot);
@@ -240,7 +247,7 @@ Vector3 CarSoccer::reflect(Car c, int n) {
       reflect = d - (2 * xNormMin * dot);
     }
   } else if (n == 2) {
-    if (y >= maxY_) {
+    if (y + r >= maxY_) {
       Vector3 yNormMax = Vector3(0,-1,0);
       dot = d.Dot(yNormMax);
       reflect = d - (2 * yNormMax * dot);
@@ -250,7 +257,7 @@ Vector3 CarSoccer::reflect(Car c, int n) {
       reflect = d - (2 * yNormMin * dot);
     }
   } else if (n == 3) {
-    if (z >= maxZ_) {
+    if (z + r >= maxZ_) {
       Vector3 zNormMax = Vector3(0,0,-1);
       dot = d.Dot(zNormMax);
       reflect = d - (2 * zNormMax * dot);

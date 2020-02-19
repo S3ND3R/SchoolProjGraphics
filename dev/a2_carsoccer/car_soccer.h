@@ -45,7 +45,7 @@ public:
 
     int collision(Car c);
 
-    Vector3 reflect(Car c, int n);
+    Vector3 reflect(Car *cptr, int n);
 
 
 
