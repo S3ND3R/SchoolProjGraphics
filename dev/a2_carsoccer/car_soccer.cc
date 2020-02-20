@@ -48,8 +48,10 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     car_.set_position(newPos);
     int colLoc = collision(car_);
     if (colLoc > 0) {
-      car_.set_velocity(reflect(&car_, colLoc));
+      car_.set_velocity(car_.velocity() + reflect(&car_, colLoc));
     }
+    std::cout << car_.velocity()[0] << "," << car_.velocity()[2] << std::endl;
+    car_.set_velocity(rotate(car_.velocity(), 45));
 
     // calculating ball position
     Vector3 newVel = ball_.velocity() + gravity_ * timeStep;
@@ -176,7 +178,7 @@ int CarSoccer::collision(Ball b) {
 
   if ( x - r <= minX_ || x + r >= maxX_ ) {
     return 1;
-  } else if (y - r <= minY_ || y + r >= maxY_) {
+  } else if (y - r < minY_ || y + r >= maxY_) {
     return 2;
   } else if (z - r <= minZ_ || z + r >= maxZ_) {
     return 3;
@@ -211,11 +213,14 @@ void CarSoccer::reflect(Ball *bptr, int n) {
   Vector3 reflect = bptr->velocity();
   Vector3 norm = Vector3(0,0,0);
   float dot;
+  float over;
 
   if (n == 1) {
     if (x + r >= maxX_) {
       // std::cout << "in x: " << bptr->position()[0] <<std::endl;
-      bptr->position()[0] = maxX_ - bptr->radius();
+      over = (x + r) - maxX_;
+      bptr->set_position(Point3((maxX_ - (over + 3)),y,z));
+      //bptr->position()[0] = maxX_ - bptr->radius();
       // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       norm = Vector3(-1,0,0);
     } else {
@@ -224,10 +229,14 @@ void CarSoccer::reflect(Ball *bptr, int n) {
     }
   } else if (n == 2) {
     if (y + r >= maxY_) {
-      bptr->position()[1] = maxY_ - bptr->radius();
+      over = (y + r) - maxY_;
+      bptr->set_position(Point3(x,(maxY_ - (over + 3)),z));
+      //bptr->position()[1] = maxY_ - bptr->radius();
       norm = Vector3(0,-1,0);
     } else {
-      bptr->position()[1] = minY_ + bptr->radius();
+      over = (y - r) - minY_;
+      bptr->set_position(Point3(x,(minY_ - (over - 3)),z));
+      // bptr->position()[1] = minY_ + bptr->radius();
       norm = Vector3(0,1,0);
     }
   } else if (n == 3) {
@@ -256,7 +265,6 @@ Vector3 CarSoccer::reflect(Car *cptr, int n) {
   if (n == 1) {
     if (x + r >= maxX_) {
       float over = (x + r) - maxX_;
-
       cptr->set_position(Point3(maxX_ - (over + 3),y,z));
       Vector3 xNormMax = Vector3(-1,0,0);
       dot = d.Dot(xNormMax);
@@ -288,4 +296,18 @@ Vector3 CarSoccer::reflect(Car *cptr, int n) {
     }
   }
   return reflect;
+}
+
+Vector3 CarSoccer::rotate(Vector3 v, float angle){
+  float x = v[0];
+  float z = v[2];
+  std::cout << "before:" << x << " and," << z << std::endl;
+  angle = GfxMath::ToRadians(angle);
+  float cosVal = cos(angle);
+  float sinVal = sin(angle);
+
+  float xp = x * cosVal - z * sinVal;
+  float zp = x * sinVal + z * cosVal;
+  std::cout << "after:" << xp << " ," << zp << std::endl;
+  return Vector3(xp, 0, zp);
 }

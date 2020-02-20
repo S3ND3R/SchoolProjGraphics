@@ -47,6 +47,8 @@ public:
 
     Vector3 reflect(Car *cptr, int n);
 
+    Vector3 rotate(Vector3 v, float angle);
+
 
 
 private:
@@ -61,7 +63,7 @@ private:
     Ball ball_;
 
     Vector3 gravity_ = Vector3(0, -9.8, 0);
-    const float friction_ = 0.95f;
+    const float friction_ = 0.50f;
 
     const float maxX_ = 40;
     const float minX_ = -40;
