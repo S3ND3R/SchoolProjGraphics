@@ -41,7 +41,7 @@ public:
     // Feel free to add more functions here as needed.
     int collision(Ball b);
 
-    Vector3 reflect(Ball *bptr, int n);
+    void reflect(Ball *bptr, int n);
 
     int collision(Car c);
 
@@ -61,13 +61,18 @@ private:
     Ball ball_;
 
     Vector3 gravity_ = Vector3(0, -9.8, 0);
+    const float friction_ = 0.95f;
 
-    float maxX_ = 40;
-    float minX_ = -40;
-    float maxY_ = 35;
-    float minY_ = 0;
-    float maxZ_ = 50;
-    float minZ_ = -50;
+    const float maxX_ = 40;
+    const float minX_ = -40;
+    const float maxY_ = 35;
+    const float minY_ = 0;
+    const float maxZ_ = 50;
+    const float minZ_ = -50;
+
+    const float lPost_ = -10;
+    const float rPost_ = 10;
+    const float tPost_ = 10;
 
 
     // Support for drawing some simple shapes:

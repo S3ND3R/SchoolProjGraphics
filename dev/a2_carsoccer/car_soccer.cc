@@ -58,7 +58,8 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     ball_.set_position(newBalPos);
     colLoc = collision(ball_);
     if (colLoc > 0) {
-      ball_.set_velocity(reflect(&ball_, colLoc));
+      reflect(&ball_, colLoc);
+      ball_.set_velocity(ball_.velocity() * friction_);
     }
 }
 
@@ -134,6 +135,31 @@ void CarSoccer::DrawUsingOpenGL() {
     quickShapes_.DrawLines(modelMatrix_, viewMatrix_, projMatrix_, cBound, strip, QuickShapes::LinesType::LINE_STRIP, 0.1);
 
     //Draw the goals
+    Color cGoal = Color(0, 0, 1);
+    std::vector<Point3> blines;
+    for(int i = lPost_; i <= rPost_; i+= 2) {
+      blines.push_back(Point3(i, tPost_, minZ_));
+      blines.push_back(Point3(i, 0, minZ_));
+    }
+    for(int i = 2; i <= tPost_; i+= 2) {
+      blines.push_back(Point3(lPost_, i, minZ_));
+      blines.push_back(Point3(rPost_, i, minZ_));
+    }
+
+    quickShapes_.DrawLines(modelMatrix_, viewMatrix_, projMatrix_, cGoal, blines, QuickShapes::LinesType::LINES, 0.2);
+
+    cGoal = Color(1, 0, 0);
+    std::vector<Point3> rlines;
+    for(int i = lPost_; i <= rPost_; i+= 2) {
+      rlines.push_back(Point3(i, tPost_, maxZ_));
+      rlines.push_back(Point3(i, 0, maxZ_));
+    }
+    for(int i = 2; i <= tPost_; i+= 2) {
+      rlines.push_back(Point3(lPost_, i, maxZ_));
+      rlines.push_back(Point3(rPost_, i, maxZ_));
+    }
+    quickShapes_.DrawLines(modelMatrix_, viewMatrix_, projMatrix_, cGoal, rlines, QuickShapes::LinesType::LINES, 0.2);
+
 
     // Debugging code that draws arrows for the velocity
     quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(1,0,0), ball_.position(), ball_.velocity(), 0.1);
@@ -176,52 +202,46 @@ int CarSoccer::collision(Car c) {
 
 }
 
-Vector3 CarSoccer::reflect(Ball *bptr, int n) {
-  float x = bptr->position()[0] + bptr->radius();
-  float y = bptr->position()[1] + bptr->radius();
-  float z = bptr->position()[2] + bptr->radius();
+void CarSoccer::reflect(Ball *bptr, int n) {
+  float x = bptr->position()[0];
+  float y = bptr->position()[1];
+  float z = bptr->position()[2];
+  float r = bptr->radius();
   Vector3 d = bptr->velocity();
   Vector3 reflect = bptr->velocity();
+  Vector3 norm = Vector3(0,0,0);
   float dot;
 
   if (n == 1) {
-    if (x >= maxX_) {
+    if (x + r >= maxX_) {
+      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       bptr->position()[0] = maxX_ - bptr->radius();
-      Vector3 xNormMax = Vector3(-1,0,0);
-      dot = d.Dot(xNormMax);
-      reflect = d - (2 * xNormMax * dot);
+      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
+      norm = Vector3(-1,0,0);
     } else {
       bptr->position()[0] = minX_ + bptr->radius();
-      Vector3 xNormMin = Vector3(1,0,0);
-      dot = d.Dot(xNormMin);
-      reflect = d - (2 * xNormMin * dot);
+      norm = Vector3(1,0,0);
     }
   } else if (n == 2) {
-    if (y >= maxY_) {
+    if (y + r >= maxY_) {
       bptr->position()[1] = maxY_ - bptr->radius();
-      Vector3 yNormMax = Vector3(0,-1,0);
-      dot = d.Dot(yNormMax);
-      reflect = d - (2 * yNormMax * dot);
+      norm = Vector3(0,-1,0);
     } else {
       bptr->position()[1] = minY_ + bptr->radius();
-      Vector3 yNormMin = Vector3(0,1,0);
-      dot = d.Dot(yNormMin);
-      reflect = d - (2 * yNormMin * dot);
+      norm = Vector3(0,1,0);
     }
   } else if (n == 3) {
-    if (z >= maxZ_) {
+    if (z + r >= maxZ_) {
       bptr->position()[2] = maxZ_ - bptr->radius();
-      Vector3 zNormMax = Vector3(0,0,-1);
-      dot = d.Dot(zNormMax);
-      reflect = d - (2 * zNormMax * dot);
+      norm = Vector3(0,0,-1);
     } else {
       bptr->position()[2] = minZ_ + bptr->radius();
-      Vector3 zNormMin = Vector3(0,0,1);
-      dot = d.Dot(zNormMin);
-      reflect = d - (2 * zNormMin * dot);
+      norm = Vector3(0,0,1);
     }
   }
-  return reflect;
+  dot = d.Dot(norm);
+  reflect = d - (2 * norm * dot);
+  bptr->set_velocity(reflect);
 }
 
 Vector3 CarSoccer::reflect(Car *cptr, int n) {
