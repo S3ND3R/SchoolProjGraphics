@@ -43,18 +43,24 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     // car and ball as needed and checking for collisions.  Filling this routine
     // in is the main part of the assignment.
     Vector2 dir = joystick_direction();
-    Vector3 thrustV( 0, 0, -dir[1]);
-    Vector3 thrust = 200 * thrustV;
-    Vector3 drag = 5 * car_.velocity();
-    Vector3 speed = (thrust - drag)*timeStep;
-    car_.set_velocity(car_.velocity() + speed);
+    float thrust = 150 * -dir[1];
+    float drag = 5 * car_.speed();
+    float newSpeed = (thrust - drag)* timeStep;
+    car_.set_speed(car_.speed() + newSpeed);
+
+    float turnRate = .06 * dir[0];
+    float incAngle = turnRate * car_.speed() * timeStep;
+    car_.set_angle(car_.angle() + incAngle);
+    std::cout << car_.angle() << std::endl;
+    Vector3 thrustV(car_.speed() * sin(car_.angle()), 0, car_.speed() * cos(car_.angle()));
+    car_.set_velocity(thrustV);
     Point3 newPos = car_.position() + car_.velocity() * timeStep;
     car_.set_position(newPos);
     int colLoc = collision(car_);
     if (colLoc > 0) {
       reflect(&car_, colLoc);
     }
-    //std::cout << car_.velocity()[0] << "," << car_.velocity()[2] << std::endl;
+    //std::cout << car_.velocity() << std::endl;
     //car_.set_velocity(rotate(car_.velocity(), 45));
 
 
