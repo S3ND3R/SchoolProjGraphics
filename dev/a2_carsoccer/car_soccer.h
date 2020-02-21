@@ -41,13 +41,15 @@ public:
     // Feel free to add more functions here as needed.
     int collision(Ball b);
 
-    void reflect(Ball *bptr, int n);
-
     int collision(Car c);
 
-    Vector3 reflect(Car *cptr, int n);
+    void reflect(Ball *bptr, int n);
+
+    void reflect(Car *cptr, int n);
 
     Vector3 rotate(Vector3 v, float angle);
+
+    bool carBallCollision(Ball& b, Car& c);
 
 
 
@@ -63,7 +65,7 @@ private:
     Ball ball_;
 
     Vector3 gravity_ = Vector3(0, -9.8, 0);
-    const float friction_ = 0.50f;
+    const float friction_ = 0.70f;
 
     const float maxX_ = 40;
     const float minX_ = -40;

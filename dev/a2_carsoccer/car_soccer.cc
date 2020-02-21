@@ -43,15 +43,22 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     // car and ball as needed and checking for collisions.  Filling this routine
     // in is the main part of the assignment.
     Vector2 dir = joystick_direction();
-    car_.set_velocity(Vector3( dir[0], 0.0, -dir[1]));
+    Vector3 thrustV( 0, 0, -dir[1]);
+    Vector3 thrust = 200 * thrustV;
+    Vector3 drag = 5 * car_.velocity();
+    Vector3 speed = (thrust - drag)*timeStep;
+    car_.set_velocity(car_.velocity() + speed);
     Point3 newPos = car_.position() + car_.velocity() * timeStep;
     car_.set_position(newPos);
     int colLoc = collision(car_);
     if (colLoc > 0) {
-      car_.set_velocity(car_.velocity() + reflect(&car_, colLoc));
+      reflect(&car_, colLoc);
     }
-    std::cout << car_.velocity()[0] << "," << car_.velocity()[2] << std::endl;
-    car_.set_velocity(rotate(car_.velocity(), 45));
+    //std::cout << car_.velocity()[0] << "," << car_.velocity()[2] << std::endl;
+    //car_.set_velocity(rotate(car_.velocity(), 45));
+
+
+
 
     // calculating ball position
     Vector3 newVel = ball_.velocity() + gravity_ * timeStep;
@@ -59,9 +66,20 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     Point3 newBalPos = ball_.position() + ball_.velocity() * timeStep;
     ball_.set_position(newBalPos);
     colLoc = collision(ball_);
+
     if (colLoc > 0) {
       reflect(&ball_, colLoc);
       ball_.set_velocity(ball_.velocity() * friction_);
+    }
+
+    if (carBallCollision(ball_, car_)) {
+      float desDist = ball_.radius() + car_.collision_radius();
+      Vector3 colVect = ball_.position() - car_.position();
+      float colDist = colVect.Length();
+      float amount = desDist - colDist;
+      Vector3 colNorm = Vector3::Normalize(colVect);
+      Point3 corP = ball_.position() - (colVect * (amount + .99));
+      ball_.set_position(corP);
     }
 }
 
@@ -178,7 +196,7 @@ int CarSoccer::collision(Ball b) {
 
   if ( x - r <= minX_ || x + r >= maxX_ ) {
     return 1;
-  } else if (y - r < minY_ || y + r >= maxY_) {
+  } else if (y - r <= minY_ || y + r >= maxY_) {
     return 2;
   } else if (z - r <= minZ_ || z + r >= maxZ_) {
     return 3;
@@ -219,32 +237,33 @@ void CarSoccer::reflect(Ball *bptr, int n) {
     if (x + r >= maxX_) {
       // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       over = (x + r) - maxX_;
-      bptr->set_position(Point3((maxX_ - (over + 3)),y,z));
+      bptr->set_position(Point3((maxX_ - (over + 3)), y, z));
       //bptr->position()[0] = maxX_ - bptr->radius();
       // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       norm = Vector3(-1,0,0);
     } else {
-      bptr->position()[0] = minX_ + bptr->radius();
+      over = (x - r) - minX_;
+      bptr->set_position(Point3((minX_ - (over - 3)), y, z));
       norm = Vector3(1,0,0);
     }
   } else if (n == 2) {
     if (y + r >= maxY_) {
       over = (y + r) - maxY_;
       bptr->set_position(Point3(x,(maxY_ - (over + 3)),z));
-      //bptr->position()[1] = maxY_ - bptr->radius();
       norm = Vector3(0,-1,0);
     } else {
       over = (y - r) - minY_;
       bptr->set_position(Point3(x,(minY_ - (over - 3)),z));
-      // bptr->position()[1] = minY_ + bptr->radius();
       norm = Vector3(0,1,0);
     }
   } else if (n == 3) {
     if (z + r >= maxZ_) {
-      bptr->position()[2] = maxZ_ - bptr->radius();
+      over = (z + r) - maxZ_;
+      bptr->set_position(Point3(x, y, (maxZ_ - (over + 3))));
       norm = Vector3(0,0,-1);
     } else {
-      bptr->position()[2] = minZ_ + bptr->radius();
+      over = (z - r) - minZ_;
+      bptr->set_position(Point3(x, y, (minZ_ - (over - 3))));
       norm = Vector3(0,0,1);
     }
   }
@@ -253,61 +272,76 @@ void CarSoccer::reflect(Ball *bptr, int n) {
   bptr->set_velocity(reflect);
 }
 
-Vector3 CarSoccer::reflect(Car *cptr, int n) {
+void CarSoccer::reflect(Car *cptr, int n) {
   float x = cptr->position()[0];
   float y = cptr->position()[1];
   float z = cptr->position()[2];
   float r = cptr->collision_radius();
   Vector3 d = cptr->velocity();
   Vector3 reflect = cptr->velocity();
+  Vector3 norm = Vector3(0,0,0);
   float dot;
+  float over;
 
   if (n == 1) {
     if (x + r >= maxX_) {
-      float over = (x + r) - maxX_;
-      cptr->set_position(Point3(maxX_ - (over + 3),y,z));
-      Vector3 xNormMax = Vector3(-1,0,0);
-      dot = d.Dot(xNormMax);
-      reflect = d - (2 * xNormMax * dot);
+      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
+      over = (x + r) - maxX_;
+      cptr->set_position(Point3((maxX_ - (over + 3)),y,z));
+      //bptr->position()[0] = maxX_ - bptr->radius();
+      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
+      norm = Vector3(-1,0,0);
     } else {
-      Vector3 xNormMin = Vector3(1,0,0);
-      dot = d.Dot(xNormMin);
-      reflect = d - (2 * xNormMin * dot);
+      over = (x - r) - minX_;
+      cptr->set_position(Point3((minX_ - (over - 3)), y, z));
+      norm = Vector3(1,0,0);
     }
   } else if (n == 2) {
     if (y + r >= maxY_) {
-      Vector3 yNormMax = Vector3(0,-1,0);
-      dot = d.Dot(yNormMax);
-      reflect = d - (2 * yNormMax * dot);
+      over = (y + r) - maxY_;
+      cptr->set_position(Point3(x,(maxY_ - (over + 3)),z));
+      norm = Vector3(0,-1,0);
     } else {
-      Vector3 yNormMin = Vector3(0,1,0);
-      dot = d.Dot(yNormMin);
-      reflect = d - (2 * yNormMin * dot);
+      over = (y - r) - minY_;
+      cptr->set_position(Point3(x,(minY_ - (over - 3)),z));
+      norm = Vector3(0,1,0);
     }
   } else if (n == 3) {
     if (z + r >= maxZ_) {
-      Vector3 zNormMax = Vector3(0,0,-1);
-      dot = d.Dot(zNormMax);
-      reflect = d - (2 * zNormMax * dot);
+      over = (z + r) - maxZ_;
+      cptr->set_position(Point3(x, y, (maxZ_ - (over + 3))));
+      norm = Vector3(0,0,-1);
     } else {
-      Vector3 zNormMin = Vector3(0,0,1);
-      dot = d.Dot(zNormMin);
-      reflect = d - (2 * zNormMin * dot);
+      over = (z - r) - minZ_;
+      cptr->set_position(Point3(x, y, (minZ_ - (over - 3))));
+      norm = Vector3(0,0,1);
     }
   }
-  return reflect;
+  dot = d.Dot(norm);
+  reflect = d - (2 * norm * dot);
+  cptr->set_velocity(reflect);
 }
 
 Vector3 CarSoccer::rotate(Vector3 v, float angle){
   float x = v[0];
   float z = v[2];
-  std::cout << "before:" << x << " and," << z << std::endl;
+  //std::cout << "before:" << x << " and," << z << std::endl;
   angle = GfxMath::ToRadians(angle);
   float cosVal = cos(angle);
   float sinVal = sin(angle);
 
   float xp = x * cosVal - z * sinVal;
   float zp = x * sinVal + z * cosVal;
-  std::cout << "after:" << xp << " ," << zp << std::endl;
+  //std::cout << "after:" << xp << " ," << zp << std::endl;
   return Vector3(xp, 0, zp);
+}
+
+bool CarSoccer::carBallCollision(Ball& b, Car& c){
+  float safeDist = b.radius() + c.collision_radius();
+  Vector3 curDistVect = b.position() - c.position();
+  float curDist = curDistVect.Length();
+  if (curDist <= safeDist) {
+    return true;
+  }
+  return false;
 }

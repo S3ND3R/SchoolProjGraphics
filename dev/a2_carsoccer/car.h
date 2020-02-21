@@ -25,8 +25,8 @@ public:
     void Reset() {
         position_ = Point3(0, size_[1]/2, 45);
         angle_ = 0.0f;
-        speed_ = 8.0f;
-        velocity_ = Vector3(0,0,0) * speed_;
+        speed_ = 0.0f;
+        velocity_ = Vector3(0,0,0);
     }
 
     float collision_radius() { return collision_radius_; }
@@ -40,7 +40,7 @@ public:
     void set_angle(float angle) { angle_ = angle; }
 
     Vector3 velocity() { return velocity_; }
-    void set_velocity(Vector3 velocity) { velocity_ = velocity * speed_; }
+    void set_velocity(Vector3 velocity) { velocity_ = velocity; }
 
     float speed() { return speed_; }
     void set_speed(float speed) { speed_ = speed; }
