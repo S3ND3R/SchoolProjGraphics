@@ -45,13 +45,13 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     Vector2 dir = joystick_direction();
 
     // calculating car speed
-    float thrust = 150 * -dir[1];
-    float drag = 5 * car_.speed();
+    float thrust = thrustCoef_ * -dir[1];
+    float drag = dragCoef_ * car_.speed();
     float newSpeed = (thrust - drag)* timeStep;
     car_.set_speed(car_.speed() + newSpeed);
 
     // calculating turn angle
-    float turnRate = .06 * dir[0];
+    float turnRate = turnCoef_ * dir[0];
     float incAngle = turnRate * car_.speed() * timeStep;
     car_.set_angle(car_.angle() + incAngle);
 
@@ -89,7 +89,7 @@ void CarSoccer::UpdateSimulation(double timeStep) {
       float colDist = colVect.Length();
       float amount = desDist - colDist;
       Vector3 colNorm = Vector3::Normalize(colVect);
-      Point3 corP = ball_.position() + (colVect * (amount + 0.99));
+      Point3 corP = ball_.position() + (colVect * (amount + epsilon_));
       ball_.set_position(corP);
       Vector3 vRel = ball_.velocity() - car_.velocity();
       float dot = vRel.Dot(colNorm);
@@ -97,7 +97,6 @@ void CarSoccer::UpdateSimulation(double timeStep) {
       ball_.set_velocity(car_.velocity() + vRel);
     }
 }
-
 
 void CarSoccer::InitOpenGL() {
     // Set up the camera in a good position to see the entire field
@@ -269,6 +268,12 @@ void CarSoccer::reflect(Ball *bptr, int n) {
       norm = Vector3(0,1,0);
     }
   } else if (n == 3) {
+    //check if goal scored
+    if (y + r <= tPost_ && x - r >= lPost_ && x + r <= rPost_) {
+      bptr->Reset();
+      car_.Reset();
+      return;
+    }
     if (z + r >= maxZ_) {
       over = (z + r) - maxZ_;
       bptr->set_position(Point3(x, y, (maxZ_ - (over + 3))));

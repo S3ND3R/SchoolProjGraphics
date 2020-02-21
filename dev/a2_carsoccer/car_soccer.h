@@ -64,6 +64,10 @@ private:
 
     Vector3 gravity_ = Vector3(0, -9.8, 0);
     const float friction_ = 0.70f;
+    const float epsilon_ = 0.0099;
+    const float thrustCoef_ = 150;
+    const float dragCoef_ = 5;
+    const float turnCoef_ = .06;
 
     const float maxX_ = 40;
     const float minX_ = -40;
