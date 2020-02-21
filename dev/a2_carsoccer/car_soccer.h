@@ -62,12 +62,12 @@ private:
     Car car_;
     Ball ball_;
 
-    Vector3 gravity_ = Vector3(0, -9.8, 0);
+    Vector3 gravity_ = Vector3(0, -12.8, 0);
     const float friction_ = 0.70f;
-    const float epsilon_ = 0.0099;
+    const float epsilon_ = 0.0099f;
     const float thrustCoef_ = 150;
     const float dragCoef_ = 5;
-    const float turnCoef_ = .06;
+    const float turnCoef_ = .06f;
 
     const float maxX_ = 40;
     const float minX_ = -40;

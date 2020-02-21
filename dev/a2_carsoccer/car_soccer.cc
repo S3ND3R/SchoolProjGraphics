@@ -70,7 +70,7 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     }
 
     // calculating ball position
-    Vector3 newVel = ball_.velocity() + gravity_ * timeStep;
+    Vector3 newVel = ball_.velocity() + (gravity_) * timeStep;
     ball_.set_velocity(newVel);
     Point3 newBalPos = ball_.position() + ball_.velocity() * timeStep;
     ball_.set_position(newBalPos);
@@ -196,8 +196,8 @@ void CarSoccer::DrawUsingOpenGL() {
 
 
     // Debugging code that draws arrows for the velocity
-    quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(1,0,0), ball_.position(), ball_.velocity(), 0.1);
-    quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(0,1,0), car_.position(), car_.velocity(), 0.1);
+    // quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(1,0,0), ball_.position(), ball_.velocity(), 0.1);
+    // quickShapes_.DrawArrow(modelMatrix_, viewMatrix_, projMatrix_, Color(0,1,0), car_.position(), car_.velocity(), 0.1);
 
 }
 
