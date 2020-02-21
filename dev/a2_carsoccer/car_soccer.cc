@@ -43,49 +43,58 @@ void CarSoccer::UpdateSimulation(double timeStep) {
     // car and ball as needed and checking for collisions.  Filling this routine
     // in is the main part of the assignment.
     Vector2 dir = joystick_direction();
+
+    // calculating car speed
     float thrust = 150 * -dir[1];
     float drag = 5 * car_.speed();
     float newSpeed = (thrust - drag)* timeStep;
     car_.set_speed(car_.speed() + newSpeed);
 
+    // calculating turn angle
     float turnRate = .06 * dir[0];
     float incAngle = turnRate * car_.speed() * timeStep;
     car_.set_angle(car_.angle() + incAngle);
-    std::cout << car_.angle() << std::endl;
+
+    // setting velocity vector of the car
     Vector3 thrustV(car_.speed() * sin(car_.angle()), 0, car_.speed() * cos(car_.angle()));
     car_.set_velocity(thrustV);
+
+    // calculating new position based on velocity vector
     Point3 newPos = car_.position() + car_.velocity() * timeStep;
     car_.set_position(newPos);
+
+    //detect collisions
     int colLoc = collision(car_);
     if (colLoc > 0) {
       reflect(&car_, colLoc);
     }
-    //std::cout << car_.velocity() << std::endl;
-    //car_.set_velocity(rotate(car_.velocity(), 45));
-
-
-
 
     // calculating ball position
     Vector3 newVel = ball_.velocity() + gravity_ * timeStep;
     ball_.set_velocity(newVel);
     Point3 newBalPos = ball_.position() + ball_.velocity() * timeStep;
     ball_.set_position(newBalPos);
-    colLoc = collision(ball_);
 
+    // detecting collisions
+    colLoc = collision(ball_);
     if (colLoc > 0) {
       reflect(&ball_, colLoc);
       ball_.set_velocity(ball_.velocity() * friction_);
     }
 
+    // detecting car ball collision
     if (carBallCollision(ball_, car_)) {
       float desDist = ball_.radius() + car_.collision_radius();
       Vector3 colVect = ball_.position() - car_.position();
       float colDist = colVect.Length();
       float amount = desDist - colDist;
       Vector3 colNorm = Vector3::Normalize(colVect);
-      Point3 corP = ball_.position() - (colVect * (amount + .99));
+      Point3 corP = ball_.position() + (colVect * (amount + 0.99));
       ball_.set_position(corP);
+      Vector3 vRel = ball_.velocity() - car_.velocity();
+      float dot = vRel.Dot(colNorm);
+      vRel = vRel - (2 * colNorm * dot);
+      ball_.set_velocity(car_.velocity() + vRel);
     }
 }
 
@@ -241,11 +250,8 @@ void CarSoccer::reflect(Ball *bptr, int n) {
 
   if (n == 1) {
     if (x + r >= maxX_) {
-      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       over = (x + r) - maxX_;
       bptr->set_position(Point3((maxX_ - (over + 3)), y, z));
-      //bptr->position()[0] = maxX_ - bptr->radius();
-      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       norm = Vector3(-1,0,0);
     } else {
       over = (x - r) - minX_;
@@ -291,11 +297,8 @@ void CarSoccer::reflect(Car *cptr, int n) {
 
   if (n == 1) {
     if (x + r >= maxX_) {
-      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       over = (x + r) - maxX_;
       cptr->set_position(Point3((maxX_ - (over + 3)),y,z));
-      //bptr->position()[0] = maxX_ - bptr->radius();
-      // std::cout << "in x: " << bptr->position()[0] <<std::endl;
       norm = Vector3(-1,0,0);
     } else {
       over = (x - r) - minX_;
@@ -326,20 +329,6 @@ void CarSoccer::reflect(Car *cptr, int n) {
   dot = d.Dot(norm);
   reflect = d - (2 * norm * dot);
   cptr->set_velocity(reflect);
-}
-
-Vector3 CarSoccer::rotate(Vector3 v, float angle){
-  float x = v[0];
-  float z = v[2];
-  //std::cout << "before:" << x << " and," << z << std::endl;
-  angle = GfxMath::ToRadians(angle);
-  float cosVal = cos(angle);
-  float sinVal = sin(angle);
-
-  float xp = x * cosVal - z * sinVal;
-  float zp = x * sinVal + z * cosVal;
-  //std::cout << "after:" << xp << " ," << zp << std::endl;
-  return Vector3(xp, 0, zp);
 }
 
 bool CarSoccer::carBallCollision(Ball& b, Car& c){

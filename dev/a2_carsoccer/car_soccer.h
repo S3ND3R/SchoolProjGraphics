@@ -47,8 +47,6 @@ public:
 
     void reflect(Car *cptr, int n);
 
-    Vector3 rotate(Vector3 v, float angle);
-
     bool carBallCollision(Ball& b, Car& c);
 
 
