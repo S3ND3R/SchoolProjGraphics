@@ -98,7 +98,7 @@ Now, write out the square's vertex array, using the familiar `Point3` class
 
 ```
 std::vector<Point3> squareVertexArray = {
-    /* --- Fill in your `Point3`s here */
+    Point3(0,0,0), Point3(0,1,0), Point3(1,0,0), Point3(1,1,0)
 };
 ```
 
@@ -110,6 +110,8 @@ triangles!). Make sure your indices are defined in counter-clockwise order
 ```
 std::vector<int> squareIndexArray = {
     /* --- Fill in your first triangle indices --- */
+    0, 2, 1,
     /* --- Fill in your second triangle indices --- */
+    2, 3, 1
 };
 ```
