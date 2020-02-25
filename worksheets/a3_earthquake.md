@@ -22,7 +22,7 @@ numbers `{0.0, 1.5, 2.0, 1.3}`, the normalized value would be `v_normalized =
  *
  * Example usage:
  *    std::vector<float> quakes = {0.0, 1.5, 2.0, 1.3};
- *    float minMagnitude = *std::min_element(quakes.begin(), quakes.end()); 
+ *    float minMagnitude = *std::min_element(quakes.begin(), quakes.end());
  */
 ```
 
@@ -32,6 +32,14 @@ normalizes the values in an arbitrary vector (list) and returns a new vector:
 ```
 std::vector<float> normalizeList(std::vector<float> quakeList) {
   /* --- Fill in your algorithm here --- */
+  float maxVal = std::max_element(quakeList.begin(), quakeList.end());
+  std::vector<float> NormQuakeList;
+  float normVal;
+  for (int i = 0; i < quakeList.size(): i++) {
+    normVal = quakeList[i] / maxVal;
+    NormQuakeList.push_back(normVal);
+  }
+  return NormQuakeList;
 }
 ```
 
@@ -52,6 +60,9 @@ std::cout << std::endl;
 
 ```
 /* --- Fill in the expected output here (e.g. 0.0, 0.5, 0.5, 1.0, 0.5, 0.12, 0.6) --- */
+
+0 0.302632 0.671053 0.144737 1 0.223684
+
 ```
 
 ## Q2: Constructing a mesh
