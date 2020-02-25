@@ -91,7 +91,7 @@ photograph or a drawing program) and label each vertex with an index number
 
 **Replace this image with your drawing:**
 
-![](./img/square.png)
+![](./img/mesh_img.png)
 
 Now, write out the square's vertex array, using the familiar `Point3` class
 (since it's in the *xy*-plane, you may assume z = 0 for all points):
