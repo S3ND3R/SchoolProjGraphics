@@ -34,50 +34,78 @@ void Example::InitOpenGL() {
 
 
     // Load the texture we will use
-    texture_.InitFromFile(Platform::FindFile("monalisa.png", search_path_));
+    texture_.InitFromFile(Platform::FindFile("campbells.png", search_path_));
 
     // Create the mesh by setting the vertex and index arrays directly
+    // the normal, texture, and vertex entries all refer to specific
+    // vertex entries, therefore they must be the same length
     std::vector<unsigned int> indices;
     std::vector<Point3> vertices;
     std::vector<Vector3> normals;
     std::vector<Point2> tex_coords;
 
-    // four vertices, each requires 3 floats: (x,y,z)
-    vertices.push_back(Point3(0,0,0));
-    vertices.push_back(Point3(1,0,0));
-    vertices.push_back(Point3(1,1,-1));
-    vertices.push_back(Point3(0,1,-1));
+    for(float x = 0.0; x < 2.0; x += 2.0) {
+      float u = x / 2.0;
+      //bottom
+      vertices.push_back(Point3(x,0,0));
+      normals.push_back(Vector3(0,0,1).ToUnit());
+      tex_coords.push_back(Point2(u,1));
 
-    // four normals, each requires 3 floats: (x,y,z)
-    normals.push_back(Vector3(0,1,1).ToUnit());
-    normals.push_back(Vector3(0,1,1).ToUnit());
-    normals.push_back(Vector3(0,1,1).ToUnit());
-    normals.push_back(Vector3(0,1,1).ToUnit());
+      //top
+      vertices.push_back(Point3(x,1,0));
+      normals.push_back(Vector3(0,0,1).ToUnit());
+      tex_coords.push_back(Point2(u,0));
 
-    // TODO: YOU ADD TEXTURE COORDINATES TO THE MESH
-    tex_coords.push_back(Point2(0,1));
-    tex_coords.push_back(Point2(1,1));
-    tex_coords.push_back(Point2(1,0));
-    tex_coords.push_back(Point2(0,0));
+      // skip in the first case where there are not sufficient vertices
+      if ( x != 0.0) {
+        int i = vertices.size();
+        indices.push_back(i - 4);
+        indices.push_back(i - 2);
+        indices.push_back(i - 3);
 
-    // indices into the arrays above for the first triangle
-    indices.push_back(0);
-    indices.push_back(1);
-    indices.push_back(2);
+        indices.push_back(i - 4);
+        indices.push_back(i - 1);
+        indices.push_back(i - 3);
 
-    // indices for the second triangle, note some are reused
-    indices.push_back(0);
-    indices.push_back(2);
-    indices.push_back(3);
+      }
+    }
 
-    mesh_.SetVertices(vertices);
-    mesh_.SetNormals(normals);
-    mesh_.SetIndices(indices);
+    // // four vertices, each requires 3 floats: (x,y,z)
+    // vertices.push_back(Point3(0,0,0));
+    // vertices.push_back(Point3(1,0,0));
+    // vertices.push_back(Point3(1,1,-1));
+    // vertices.push_back(Point3(0,1,-1));
+    //
+    // // four normals, each requires 3 floats: (x,y,z)
+    // normals.push_back(Vector3(0,1,1).ToUnit());
+    // normals.push_back(Vector3(0,1,1).ToUnit());
+    // normals.push_back(Vector3(0,1,1).ToUnit());
+    // normals.push_back(Vector3(0,1,1).ToUnit());
+    //
+    // // TODO: YOU ADD TEXTURE COORDINATES TO THE MESH
+    // tex_coords.push_back(Point2(0,1));
+    // tex_coords.push_back(Point2(1,1));
+    // tex_coords.push_back(Point2(1,0));
+    // tex_coords.push_back(Point2(0,0));
+    //
+    // // indices into the arrays above for the first triangle
+    // indices.push_back(0);
+    // indices.push_back(1);
+    // indices.push_back(2);
+    //
+    // // indices for the second triangle, note some are reused
+    // indices.push_back(0);
+    // indices.push_back(2);
+    // indices.push_back(3);
 
     // TODO: ALSO REMEMBER TO CALL mesh_.SetTexCoords(..) HERE ONCE YOU HAVE THEM DEFINED.
     // USE TEXTURE UNIT = 0 SINCE WE HAVE ONLY ONE TEXTURE APPLIED TO THE MESH.
+    mesh_.SetVertices(vertices);
+    mesh_.SetNormals(normals);
+    mesh_.SetIndices(indices);
     mesh_.SetTexCoords(0,tex_coords);
 
+    // update the gpu memory with the new arrays
     mesh_.UpdateGPUMemory();
 
 }
