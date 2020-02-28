@@ -20,7 +20,7 @@ QuakeApp::QuakeApp() : GraphicsApp(1280,720, "Earthquake"),
     search_path_.push_back("./data");
     search_path_.push_back(DATA_DIR_INSTALL);
     search_path_.push_back(DATA_DIR_BUILD);
-    
+
     quake_db_ = EarthquakeDatabase(Platform::FindFile("earthquakes.txt", search_path_));
     current_time_ = quake_db_.earthquake(quake_db_.min_index()).date().ToSeconds();
 
@@ -37,23 +37,23 @@ void QuakeApp::InitNanoGUI() {
     window->setPosition(Eigen::Vector2i(10, 10));
     window->setSize(Eigen::Vector2i(400,200));
     window->setLayout(new nanogui::GroupLayout());
-    
+
     date_label_ = new nanogui::Label(window, "Current Date: MM/DD/YYYY", "sans-bold");
-    
+
     globe_btn_ = new nanogui::Button(window, "Globe");
     globe_btn_->setCallback(std::bind(&QuakeApp::OnGlobeBtnPressed, this));
     globe_btn_->setTooltip("Toggle between map and globe.");
-    
+
     new nanogui::Label(window, "Playback Speed", "sans-bold");
-    
+
     nanogui::Widget *panel = new nanogui::Widget(window);
     panel->setLayout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
                                             nanogui::Alignment::Middle, 0, 20));
-    
+
     nanogui::Slider *slider = new nanogui::Slider(panel);
     slider->setValue(0.5f);
     slider->setFixedWidth(120);
-    
+
     speed_box_ = new nanogui::TextBox(panel);
     speed_box_->setFixedSize(Eigen::Vector2i(60, 25));
     speed_box_->setValue("50");
@@ -62,11 +62,11 @@ void QuakeApp::InitNanoGUI() {
     speed_box_->setFixedSize(Eigen::Vector2i(60,25));
     speed_box_->setFontSize(20);
     speed_box_->setAlignment(nanogui::TextBox::Alignment::Right);
-    
+
     nanogui::Button* debug_btn = new nanogui::Button(window, "Toggle Debug Mode");
     debug_btn->setCallback(std::bind(&QuakeApp::OnDebugBtnPressed, this));
     debug_btn->setTooltip("Toggle displaying mesh triangles and normals (can be slow)");
-    
+
     screen()->performLayout();
 }
 
@@ -99,14 +99,14 @@ void QuakeApp::UpdateSimulation(double dt)  {
     if (current_time_ < quake_db_.earthquake(quake_db_.min_index()).date().ToSeconds()) {
         current_time_ = quake_db_.earthquake(quake_db_.max_index()).date().ToSeconds();
     }
-    
+
     Date d(current_time_);
     stringstream s;
     s << "Current date: " << d.month()
         << "/" << d.day()
         << "/" << d.year();
     date_label_->setCaption(s.str());
-    
+
     // TODO: Any animation, morphing, rotation of the earth, or other things that should
     // be updated once each frame would go here.
 }
@@ -117,7 +117,7 @@ void QuakeApp::InitOpenGL() {
     proj_matrix_ = Matrix4::Perspective(60, aspect_ratio(), 0.1, 50);
     view_matrix_ = Matrix4::LookAt(Point3(0,0,3.5), Point3(0,0,0), Vector3(0,1,0));
     glClearColor(0.0, 0.0, 0.0, 1);
-    
+
     // Initialize the earth object
     earth_.Init(search_path_);
 
@@ -128,12 +128,12 @@ void QuakeApp::InitOpenGL() {
 
 void QuakeApp::DrawUsingOpenGL() {
     quick_shapes_.DrawFullscreenTexture(Color(1,1,1), stars_tex_);
-    
+
     // You can leave this as the identity matrix and we will have a fine view of
     // the earth.  If you want to add any rotation or other animation of the
     // earth, the model_matrix is where you would apply that.
     Matrix4 model_matrix;
-    
+
     // Draw the earth
     earth_.Draw(model_matrix, view_matrix_, proj_matrix_);
     if (debug_mode_) {
@@ -143,8 +143,7 @@ void QuakeApp::DrawUsingOpenGL() {
     // TODO: You'll also need to draw the earthquakes.  It's up to you exactly
     // how you wish to do that.
 
+    // Debuggin draw tools
+    quick_shapes_.DrawAxes(model_matrix, view_matrix_, proj_matrix_);
+
 }
-
-
-
-

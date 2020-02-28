@@ -20,7 +20,7 @@ Earth::~Earth() {
 void Earth::Init(const std::vector<std::string> &search_path) {
     // init shader program
     shader_.Init();
-    
+
     // init texture: you can change to a lower-res texture here if needed
     earth_tex_.InitFromFile(Platform::FindFile("earth-2k.png", search_path));
 
@@ -44,14 +44,16 @@ void Earth::Init(const std::vector<std::string> &search_path) {
     indices.push_back(0);
     indices.push_back(1);
     indices.push_back(2);
-    
+
     // indices for the second triangle, note some are reused
     indices.push_back(0);
     indices.push_back(2);
     indices.push_back(3);
-    
+
     earth_mesh_.SetVertices(vertices);
     earth_mesh_.SetIndices(indices);
+
+    // Update the GPU with the mesh
     earth_mesh_.UpdateGPUMemory();
 }
 
@@ -111,4 +113,3 @@ void Earth::DrawDebugInfo(const Matrix4 &model_matrix, const Matrix4 &view_matri
             Color(1,1,0), loop, QuickShapes::LinesType::LINE_LOOP, 0.005);
     }
 }
-
