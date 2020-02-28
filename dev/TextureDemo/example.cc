@@ -29,7 +29,7 @@ void Example::UpdateSimulation(double dt)  {
 void Example::InitOpenGL() {
     // Set up the camera in a good position to see the entire scene
     proj_matrix_ = Matrix4::Perspective(60, aspect_ratio(), 0.01, 100);
-    view_matrix_ = Matrix4::LookAt(Point3(2,1,4), Point3(2,1,0), Vector3(0,1,0));
+    view_matrix_ = Matrix4::LookAt(Point3(2,1,15), Point3(2,1,0), Vector3(0,1,0));
     glClearColor(1,1,1,1);
 
 
@@ -44,43 +44,42 @@ void Example::InitOpenGL() {
     std::vector<Vector3> normals;
     std::vector<Point2> tex_coords;
 
-    for(float x = 0.0; x < 2.0; x += 2.0) {
-      float u = x / 2.0;
+    for(float x = 0.0; x <= 2.0*M_PI; x += M_PI/20.0) {
+      float u = x / (2.0*M_PI);
       //bottom
-      vertices.push_back(Point3(x,0,0));
+      vertices.push_back(Point3(sin(x),0,cos(x)));
       normals.push_back(Vector3(0,0,1).ToUnit());
       tex_coords.push_back(Point2(u,1));
 
       //top
-      vertices.push_back(Point3(x,1,0));
+      vertices.push_back(Point3(sin(x),1,cos(x)));
       normals.push_back(Vector3(0,0,1).ToUnit());
       tex_coords.push_back(Point2(u,0));
 
-      // skip in the first case where there are not sufficient vertices
+      //skip in the first case where there are not sufficient vertices
       if ( x != 0.0) {
         int i = vertices.size();
-        indices.push_back(i - 4);
-        indices.push_back(i - 2);
-        indices.push_back(i - 3);
-
         indices.push_back(i - 4);
         indices.push_back(i - 1);
         indices.push_back(i - 3);
 
+        indices.push_back(i - 4);
+        indices.push_back(i - 2);
+        indices.push_back(i - 1);
       }
-    }
+   }
 
     // // four vertices, each requires 3 floats: (x,y,z)
     // vertices.push_back(Point3(0,0,0));
     // vertices.push_back(Point3(1,0,0));
-    // vertices.push_back(Point3(1,1,-1));
-    // vertices.push_back(Point3(0,1,-1));
+    // vertices.push_back(Point3(1,1,0));
+    // vertices.push_back(Point3(0,1,0));
     //
     // // four normals, each requires 3 floats: (x,y,z)
-    // normals.push_back(Vector3(0,1,1).ToUnit());
-    // normals.push_back(Vector3(0,1,1).ToUnit());
-    // normals.push_back(Vector3(0,1,1).ToUnit());
-    // normals.push_back(Vector3(0,1,1).ToUnit());
+    // normals.push_back(Vector3(0,1,0).ToUnit());
+    // normals.push_back(Vector3(0,1,0).ToUnit());
+    // normals.push_back(Vector3(0,1,0).ToUnit());
+    // normals.push_back(Vector3(0,1,0).ToUnit());
     //
     // // TODO: YOU ADD TEXTURE COORDINATES TO THE MESH
     // tex_coords.push_back(Point2(0,1));
@@ -120,7 +119,7 @@ void Example::DrawUsingOpenGL() {
 
     // We're already learned about how to use transformation matrices to move
     // an individual model around within the scene.
-    Matrix4 model_matrix = Matrix4::Scale(Vector3(4,4,4));
+    Matrix4 model_matrix = Matrix4::Scale(Vector3(3,3,3));
 
 
     // Since we want to texture the mesh we will define a custom material for the
