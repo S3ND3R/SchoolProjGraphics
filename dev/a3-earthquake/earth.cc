@@ -25,30 +25,53 @@ void Earth::Init(const std::vector<std::string> &search_path) {
     earth_tex_.InitFromFile(Platform::FindFile("earth-2k.png", search_path));
 
     // init geometry
-    const int nslices = 10;
-    const int nstacks = 10;
+    const int nslices = 6;
+    const int nstacks = 3;
 
     // TODO: This is where you need to set the vertices and indiceds for earth_mesh_.
-
-    // As a demo, we'll add a square with 2 triangles.
     std::vector<unsigned int> indices;
     std::vector<Point3> vertices;
 
-    // four vertices
-    vertices.push_back(Point3(0,0,0));
-    vertices.push_back(Point3(1,0,0));
-    vertices.push_back(Point3(1,1,0));
-    vertices.push_back(Point3(0,1,0));
+    for (float x = -M_PI; x <= M_PI ; x += 2 * M_PI / nslices) {
+      // top
+      vertices.push_back(Point3(x,1,0));
 
-    // indices into the arrays above for the first triangle
-    indices.push_back(0);
-    indices.push_back(1);
-    indices.push_back(2);
+      // bottom
+      vertices.push_back(Point3(x,0,0));
 
-    // indices for the second triangle, note some are reused
-    indices.push_back(0);
-    indices.push_back(2);
-    indices.push_back(3);
+      //skip in the first case where there are not sufficient vertices
+      if ( x != -M_PI) {
+        int i = vertices.size();
+        indices.push_back(i - 4);
+        indices.push_back(i - 3);
+        indices.push_back(i - 2);
+
+        indices.push_back(i - 2);
+        indices.push_back(i - 3);
+        indices.push_back(i - 1);
+      }
+    }
+
+
+
+    // As a demo, we'll add a square with 2 triangles.
+
+
+    // // four vertices
+    // vertices.push_back(Point3(0,0,0));
+    // vertices.push_back(Point3(1,0,0));
+    // vertices.push_back(Point3(1,1,0));
+    // vertices.push_back(Point3(0,1,0));
+
+    // // indices into the arrays above for the first triangle
+    // indices.push_back(0);
+    // indices.push_back(1);
+    // indices.push_back(2);
+    //
+    // // indices for the second triangle, note some are reused
+    // indices.push_back(0);
+    // indices.push_back(2);
+    // indices.push_back(3);
 
     earth_mesh_.SetVertices(vertices);
     earth_mesh_.SetIndices(indices);
