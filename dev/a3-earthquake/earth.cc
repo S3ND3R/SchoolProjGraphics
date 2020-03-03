@@ -25,26 +25,26 @@ void Earth::Init(const std::vector<std::string> &search_path) {
     earth_tex_.InitFromFile(Platform::FindFile("earth-2k.png", search_path));
 
     // init geometry
-    const int nslices = 20;
-    const int nstacks = 20;
+    const int nslices = 40;
+    const int nstacks = 40;
     const float epsilon = .000000999;
 
     // TODO: This is where you need to set the vertices and indiceds for earth_mesh_.
     std::vector<unsigned int> indices;
-    std::vector<Point3> vertices;
     std::vector<Point2> tex_coords;
 
-    // Construct the vertecies and index arrays
+    // Construct the vertecies and index arrays for plane
     int base = 4 + 2 * (nstacks - 1);
     for (float x = -M_PI; x < M_PI + epsilon; x += 2 * M_PI / nslices) {
       for (float y = -(M_PI / 2); y < (M_PI / 2) + epsilon; y += M_PI / nstacks) {
         float u = (x + M_PI) / (2* M_PI);
         float v = (y + (M_PI / 2)) / M_PI;
-        vertices.push_back(Point3(x,y,0));
+        p_vertices_.push_back(Point3(x,y,0));
         tex_coords.push_back(Point2(u,-v));
+        p_normals_.push_back(Vector3(0,0,1));
       }
       //skip in the first case where there are not sufficient vertices
-      int i = vertices.size();
+      int i = p_vertices_.size();
       if ( x > (-M_PI + epsilon)) {
         for (int n = 0; n < nstacks; n++) {
           //bottom
@@ -59,8 +59,23 @@ void Earth::Init(const std::vector<std::string> &search_path) {
         }
       }
     }
+
+    // Set the vertices and normals for sphere
+    for (float x = -M_PI; x < M_PI + epsilon; x += 2 * M_PI / nslices) {
+      for (float y = -(M_PI / 2); y < (M_PI / 2) + epsilon; y += M_PI / nstacks) {
+        float u = (x + M_PI) / (2* M_PI);
+        float v = (y + (M_PI / 2)) / M_PI;
+        float sphereX = cos(y) * sin(x);
+        float sphereY = sin(y);
+        float sphereZ = cos(y) * cos(x);
+        s_vertices_.push_back(Point3(sphereX,sphereY,sphereZ));
+        s_normals_.push_back(Vector3(sphereX,sphereY,sphereZ).ToUnit());
+      }
+    }
+
     //Set the mesh
-    earth_mesh_.SetVertices(vertices);
+    earth_mesh_.SetVertices(p_vertices_);
+    earth_mesh_.SetNormals(p_normals_);
     earth_mesh_.SetIndices(indices);
     earth_mesh_.SetTexCoords(0,tex_coords);
 
@@ -99,7 +114,10 @@ void Earth::Draw(const Matrix4 &model_matrix, const Matrix4 &view_matrix, const 
 Point3 Earth::LatLongToSphere(double latitude, double longitude) const {
     // TODO: We recommend filling in this function to put all your
     // lat,long --> sphere calculations in one place.
-    return Point3(0,0,0);
+    float sphereX = cos(latitude) * sin(longitude);
+    float sphereY = sin(latitude);
+    float sphereZ = cos(latitude) * cos(longitude);
+    return Point3(sphereX,sphereY,sphereZ);
 }
 
 Point3 Earth::LatLongToPlane(double latitude, double longitude) const {
@@ -125,4 +143,16 @@ void Earth::DrawDebugInfo(const Matrix4 &model_matrix, const Matrix4 &view_matri
         quick_shapes_.DrawLines(model_matrix, view_matrix, proj_matrix,
             Color(1,1,0), loop, QuickShapes::LinesType::LINE_LOOP, 0.005);
     }
+}
+
+void Earth::InitSphere() {
+  earth_mesh_.SetVertices(s_vertices_);
+  earth_mesh_.SetNormals(s_normals_);
+  earth_mesh_.UpdateGPUMemory();
+}
+
+void Earth::InitPlane() {
+  earth_mesh_.SetVertices(p_vertices_);
+  earth_mesh_.SetNormals(p_normals_);
+  earth_mesh_.UpdateGPUMemory();
 }

@@ -36,6 +36,10 @@ public:
     /// draws the triangles and normals for the current earth mesh.
     void DrawDebugInfo(const Matrix4 &model_matrix, const Matrix4 &view_matrix, const Matrix4 &proj_matrix);
 
+    void InitPlane();
+
+    void InitSphere();
+
 protected:
 
     // Stores the earth texture map
@@ -50,6 +54,12 @@ protected:
 
     // Used only for the DrawDebugInfo() routine
     QuickShapes quick_shapes_;
+
+    // arrays for meshes
+    std::vector<Point3> p_vertices_;
+    std::vector<Vector3> p_normals_;
+    std::vector<Point3> s_vertices_;
+    std::vector<Vector3> s_normals_;
 };
 
 

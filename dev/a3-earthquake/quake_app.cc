@@ -13,7 +13,8 @@ const int PLAYBACK_WINDOW = 12 * 28 * 24 * 60 * 60;
 using namespace std;
 
 QuakeApp::QuakeApp() : GraphicsApp(1280,720, "Earthquake"),
-    playback_scale_(15000000.0), debug_mode_(false)
+    playback_scale_(15000000.0), debug_mode_(false), globe_mode_(false),
+    alpha_(0.0)
 {
     // Define a search path for finding data files (images and earthquake db)
     search_path_.push_back(".");
@@ -74,11 +75,18 @@ void QuakeApp::InitNanoGUI() {
 void QuakeApp::OnLeftMouseDrag(const Point2 &pos, const Vector2 &delta) {
     // Optional: In our demo, we adjust the tilt of the globe here when the
     // mouse is dragged up/down on the screen.
+    alpha_ += 5.0;
 }
 
 
 void QuakeApp::OnGlobeBtnPressed() {
     // TODO: This is where you can switch between flat earth mode and globe mode
+    globe_mode_ = !globe_mode_;
+    if (globe_mode_) {
+      earth_.InitSphere();
+    } else {
+      earth_.InitPlane();
+    }
 }
 
 void QuakeApp::OnDebugBtnPressed() {
@@ -118,11 +126,13 @@ void QuakeApp::UpdateSimulation(double dt)  {
       quake_window_.clear();
       quake_window_.push_back(quake_db_.earthquake(qindx));
 
-      std::cout << "Quake on: " << quake_window_[0].date().ToSeconds() << std::endl;
-
       float qlat = quake_window_[0].latitude();
       float qlong = quake_window_[0].longitude();
-      qPosition_ = earth_.LatLongToPlane(qlat, qlong);
+      if (globe_mode_) {
+        qPosition_ = earth_.LatLongToSphere(qlat, qlong);
+      } else {
+        qPosition_ = earth_.LatLongToPlane(qlat, qlong);
+      }
     }
   }
 
@@ -150,18 +160,18 @@ void QuakeApp::DrawUsingOpenGL() {
     Matrix4 model_matrix;
 
     // Draw the earth
-    earth_.Draw(model_matrix, view_matrix_, proj_matrix_);
+    Matrix4 mEarth;
+    if (globe_mode_){
+      mEarth = Matrix4::RotationY(GfxMath::ToRadians(alpha_));
+    }
+    earth_.Draw(model_matrix * mEarth, view_matrix_, proj_matrix_);
     if (debug_mode_) {
         earth_.DrawDebugInfo(model_matrix, view_matrix_, proj_matrix_);
     }
 
     // TODO: You'll also need to draw the earthquakes.  It's up to you exactly
     // how you wish to do that.
-    // Color qcol(0.9,0,0);
-    // Matrix4 Mquake =
-    // Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
-    // Matrix4::Scale(Vector3(.05, .05, .05));
-    // quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
+
     DrawQuake(model_matrix, view_matrix_, proj_matrix_);
 
 
@@ -172,8 +182,7 @@ void QuakeApp::DrawUsingOpenGL() {
 
 void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix, const Matrix4 &proj_matrix) {
   Color qcol(0.9,0,0);
-  Matrix4 Mquake =
-  Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
-  Matrix4::Scale(Vector3(.05, .05, .05));
+  Matrix4 Mquake = Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
+                   Matrix4::Scale(Vector3(.05, .05, .05));
   quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
 }

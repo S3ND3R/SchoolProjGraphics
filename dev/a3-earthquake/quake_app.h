@@ -57,6 +57,8 @@ private:
     // true if drawing debugging info for the mesh
     bool debug_mode_;
 
+    bool globe_mode_;
+
     // Database through which you can access the earthquakes
     EarthquakeDatabase quake_db_;
 
@@ -84,6 +86,8 @@ private:
 
     // used to draw quake position
     Point3 qPosition_;
+
+    float alpha_;
 
     // quake date
     Date qDate;
