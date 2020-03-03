@@ -25,8 +25,8 @@ void Earth::Init(const std::vector<std::string> &search_path) {
     earth_tex_.InitFromFile(Platform::FindFile("earth-2k.png", search_path));
 
     // init geometry
-    const int nslices = 40;
-    const int nstacks = 40;
+    const int nslices = 20;
+    const int nstacks = 20;
     const float epsilon = .000000999;
 
     // TODO: This is where you need to set the vertices and indiceds for earth_mesh_.
@@ -40,9 +40,8 @@ void Earth::Init(const std::vector<std::string> &search_path) {
       for (float y = -(M_PI / 2); y < (M_PI / 2) + epsilon; y += M_PI / nstacks) {
         float u = (x + M_PI) / (2* M_PI);
         float v = (y + (M_PI / 2)) / M_PI;
-        std::cout << "X: [" << x << "] Y: [" << y << "] U: [" << u << "] V: [" << v << "]" << std::endl;
         vertices.push_back(Point3(x,y,0));
-        tex_coords.push_back(Point2(-u,-v));
+        tex_coords.push_back(Point2(u,-v));
       }
       //skip in the first case where there are not sufficient vertices
       int i = vertices.size();
@@ -106,7 +105,9 @@ Point3 Earth::LatLongToSphere(double latitude, double longitude) const {
 Point3 Earth::LatLongToPlane(double latitude, double longitude) const {
     // TODO: We recommend filling in this function to put all your
     // lat,long --> plane calculations in one place.
-    return Point3(0,0,0);
+    float qlat = GfxMath::ToRadians(latitude);
+    float qlon = GfxMath::ToRadians(longitude);
+    return Point3(qlon,qlat,0);
 }
 
 

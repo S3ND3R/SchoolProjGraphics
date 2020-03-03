@@ -23,6 +23,7 @@ QuakeApp::QuakeApp() : GraphicsApp(1280,720, "Earthquake"),
 
     quake_db_ = EarthquakeDatabase(Platform::FindFile("earthquakes.txt", search_path_));
     current_time_ = quake_db_.earthquake(quake_db_.min_index()).date().ToSeconds();
+    qPosition_ = Point3(0,0,0);
 
  }
 
@@ -109,7 +110,21 @@ void QuakeApp::UpdateSimulation(double dt)  {
 
     // TODO: Any animation, morphing, rotation of the earth, or other things that should
     // be updated once each frame would go here.
-}
+    double max_window = current_time_ + PLAYBACK_WINDOW;
+    double min_window = current_time_ - PLAYBACK_WINDOW;
+    int qindx = quake_db_.FindMostRecentQuake(d);
+    double dat = quake_db_.earthquake(qindx).date().ToSeconds();
+    if (dat > min_window && dat < max_window) {
+      quake_window_.clear();
+      quake_window_.push_back(quake_db_.earthquake(qindx));
+
+      std::cout << "Quake on: " << quake_window_[0].date().ToSeconds() << std::endl;
+
+      float qlat = quake_window_[0].latitude();
+      float qlong = quake_window_[0].longitude();
+      qPosition_ = earth_.LatLongToPlane(qlat, qlong);
+    }
+  }
 
 
 void QuakeApp::InitOpenGL() {
@@ -142,8 +157,23 @@ void QuakeApp::DrawUsingOpenGL() {
 
     // TODO: You'll also need to draw the earthquakes.  It's up to you exactly
     // how you wish to do that.
+    // Color qcol(0.9,0,0);
+    // Matrix4 Mquake =
+    // Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
+    // Matrix4::Scale(Vector3(.05, .05, .05));
+    // quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
+    DrawQuake(model_matrix, view_matrix_, proj_matrix_);
+
 
     // Debuggin draw tools
-    quick_shapes_.DrawAxes(model_matrix, view_matrix_, proj_matrix_);
+    //quick_shapes_.DrawAxes(model_matrix, view_matrix_, proj_matrix_);
 
+}
+
+void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix, const Matrix4 &proj_matrix) {
+  Color qcol(0.9,0,0);
+  Matrix4 Mquake =
+  Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
+  Matrix4::Scale(Vector3(.05, .05, .05));
+  quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
 }

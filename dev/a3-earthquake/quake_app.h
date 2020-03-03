@@ -14,23 +14,23 @@ using namespace mingfx;
 #include <vector>
 
 
-/** Main application class for the Earthquake app. 
+/** Main application class for the Earthquake app.
  */
 class QuakeApp : public GraphicsApp {
 public:
-  
+
     QuakeApp();
     virtual ~QuakeApp();
-    
+
     /// Dragging with the mouse tilts the earth when in globe mode
     void OnLeftMouseDrag(const Point2 &pos, const Vector2 &delta);
 
     /// Pressing the globe button toggles between flat earth and sphere earth modes
     void OnGlobeBtnPressed();
-    
+
     /// Pressing the debug button toggles on/off the underlying triangle mesh and normals
     void OnDebugBtnPressed();
-    
+
     /// The slides controls the speed of the playback for the earthquakes animation
     void OnSliderUpdate(float value);
 
@@ -46,7 +46,9 @@ public:
 
     /// The earth and earthquake spheres get drawn in this function.
     void DrawUsingOpenGL();
-    
+
+    void DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix, const Matrix4 &proj_matrix);
+
 private:
     // controls playback
     double current_time_;
@@ -54,31 +56,40 @@ private:
 
     // true if drawing debugging info for the mesh
     bool debug_mode_;
-    
+
     // Database through which you can access the earthquakes
     EarthquakeDatabase quake_db_;
 
     // Object for rendering textured earth geometry
     Earth earth_;
-    
+
     // Background image
     Texture2D stars_tex_;
 
     // Sets up the computer graphics camera
     Matrix4 view_matrix_;
     Matrix4 proj_matrix_;
-    
+
     // Gui elements
     nanogui::Button  *globe_btn_;
     nanogui::Label   *date_label_;
     nanogui::TextBox *speed_box_;
-    
+
     // A list of paths to search for data files (images and shaders)
     std::vector<std::string> search_path_;
-    
+
     // Used to draw a background texture, you can also use this to draw the
     // earthquakes if you want.
     QuickShapes quick_shapes_;
+
+    // used to draw quake position
+    Point3 qPosition_;
+
+    // quake date
+    Date qDate;
+
+    // quake window
+    std::vector<Earthquake> quake_window_;
 };
 
 #endif
