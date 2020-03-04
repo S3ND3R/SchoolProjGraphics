@@ -11,7 +11,7 @@
 #include <math.h>
 
 
-Earth::Earth() : alpha_(0) {
+Earth::Earth() : alpha_(2.0) {
 }
 
 Earth::~Earth() {

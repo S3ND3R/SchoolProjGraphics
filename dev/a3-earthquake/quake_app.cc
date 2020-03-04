@@ -77,7 +77,7 @@ void QuakeApp::InitNanoGUI() {
 void QuakeApp::OnLeftMouseDrag(const Point2 &pos, const Vector2 &delta) {
     // Optional: In our demo, we adjust the tilt of the globe here when the
     // mouse is dragged up/down on the screen.
-    alpha_ += 5.0;
+    //alpha_ += 5.0;
 }
 
 
@@ -163,9 +163,9 @@ void QuakeApp::DrawUsingOpenGL() {
 
     // Draw the earth
     Matrix4 mEarth;
-    if (globe_mode_){
-      mEarth = Matrix4::RotationY(GfxMath::ToRadians(alpha_));
-    }
+    // if (globe_mode_){
+    //   mEarth = Matrix4::RotationY(GfxMath::ToRadians(alpha_));
+    // }
     earth_.Draw(model_matrix * mEarth, view_matrix_, proj_matrix_);
     if (debug_mode_) {
         earth_.DrawDebugInfo(model_matrix, view_matrix_, proj_matrix_);
