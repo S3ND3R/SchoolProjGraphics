@@ -26,6 +26,7 @@ QuakeApp::QuakeApp() : GraphicsApp(1280,720, "Earthquake"),
     current_time_ = quake_db_.earthquake(quake_db_.min_index()).date().ToSeconds();
     qPosition_ = Point3(0,0,0);
     maxMag_ = quake_db_.max_magnitude();
+    minMag_ = quake_db_.min_magnitude();
 
  }
 
@@ -181,15 +182,7 @@ void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix
     } else {
       qPosition_ = earth_.LatLongToPlane(qlat, qlong);
     }
-    float normMag = quake_window_[i].magnitude()/ maxMag_;
-    if (normMag > .8) {
-      normMag = 1;
-    } else if (normMag > .7) {
-      normMag = 0.5;
-    } else {
-      normMag = 0.3;
-    }
-    std::cout << normMag << std::endl;
+    float normMag = (quake_window_[i].magnitude() - minMag_) / (maxMag_ - minMag_);
     Color qcol(normMag,0,0);
     Matrix4 Mquake = Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
                      Matrix4::Scale(Vector3(.05, .05, .05));
