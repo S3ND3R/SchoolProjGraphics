@@ -25,6 +25,7 @@ QuakeApp::QuakeApp() : GraphicsApp(1280,720, "Earthquake"),
     quake_db_ = EarthquakeDatabase(Platform::FindFile("earthquakes.txt", search_path_));
     current_time_ = quake_db_.earthquake(quake_db_.min_index()).date().ToSeconds();
     qPosition_ = Point3(0,0,0);
+    maxMag_ = quake_db_.max_magnitude();
 
  }
 
@@ -118,22 +119,18 @@ void QuakeApp::UpdateSimulation(double dt)  {
 
     // TODO: Any animation, morphing, rotation of the earth, or other things that should
     // be updated once each frame would go here.
-    double max_window = current_time_ + PLAYBACK_WINDOW;
+    // double max_window = current_time_ + PLAYBACK_WINDOW;
     double min_window = current_time_ - PLAYBACK_WINDOW;
     int qindx = quake_db_.FindMostRecentQuake(d);
-    double dat = quake_db_.earthquake(qindx).date().ToSeconds();
-    if (dat > min_window && dat < max_window) {
-      quake_window_.clear();
-      quake_window_.push_back(quake_db_.earthquake(qindx));
-
-      float qlat = quake_window_[0].latitude();
-      float qlong = quake_window_[0].longitude();
-      if (globe_mode_) {
-        qPosition_ = earth_.LatLongToSphere(qlat, qlong);
-      } else {
-        qPosition_ = earth_.LatLongToPlane(qlat, qlong);
+    double qDate = quake_db_.earthquake(qindx).date().ToSeconds();
+    quake_window_.clear();
+    while (qDate >= min_window && qindx >= 0) {
+      qDate = quake_db_.earthquake(qindx).date().ToSeconds();
+      if (qDate <= current_time_) {
+        quake_window_.push_back(quake_db_.earthquake(qindx));
       }
-    }
+      qindx--;
+      }
   }
 
 
@@ -171,18 +168,31 @@ void QuakeApp::DrawUsingOpenGL() {
 
     // TODO: You'll also need to draw the earthquakes.  It's up to you exactly
     // how you wish to do that.
-
     DrawQuake(model_matrix, view_matrix_, proj_matrix_);
-
-
-    // Debuggin draw tools
-    //quick_shapes_.DrawAxes(model_matrix, view_matrix_, proj_matrix_);
 
 }
 
 void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix, const Matrix4 &proj_matrix) {
-  Color qcol(0.9,0,0);
-  Matrix4 Mquake = Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
-                   Matrix4::Scale(Vector3(.05, .05, .05));
-  quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
+  for (int i = 0; i < quake_window_.size(); i++) {
+    float qlat = quake_window_[i].latitude();
+    float qlong = quake_window_[i].longitude();
+    if (globe_mode_) {
+      qPosition_ = earth_.LatLongToSphere(qlat, qlong);
+    } else {
+      qPosition_ = earth_.LatLongToPlane(qlat, qlong);
+    }
+    float normMag = quake_window_[i].magnitude()/ maxMag_;
+    if (normMag > .8) {
+      normMag = 1;
+    } else if (normMag > .7) {
+      normMag = 0.5;
+    } else {
+      normMag = 0.3;
+    }
+    std::cout << normMag << std::endl;
+    Color qcol(normMag,0,0);
+    Matrix4 Mquake = Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
+                     Matrix4::Scale(Vector3(.05, .05, .05));
+    quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
+  }
 }

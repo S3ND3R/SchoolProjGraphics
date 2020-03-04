@@ -94,6 +94,8 @@ private:
 
     // quake window
     std::vector<Earthquake> quake_window_;
+
+    float maxMag_;
 };
 
 #endif

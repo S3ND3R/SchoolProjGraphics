@@ -114,9 +114,11 @@ void Earth::Draw(const Matrix4 &model_matrix, const Matrix4 &view_matrix, const 
 Point3 Earth::LatLongToSphere(double latitude, double longitude) const {
     // TODO: We recommend filling in this function to put all your
     // lat,long --> sphere calculations in one place.
-    float sphereX = cos(latitude) * sin(longitude);
-    float sphereY = sin(latitude);
-    float sphereZ = cos(latitude) * cos(longitude);
+    float qlat = GfxMath::ToRadians(latitude);
+    float qlon = GfxMath::ToRadians(longitude);
+    float sphereX = cos(qlat) * sin(qlon);
+    float sphereY = sin(qlat);
+    float sphereZ = cos(qlat) * cos(qlon);
     return Point3(sphereX,sphereY,sphereZ);
 }
 
