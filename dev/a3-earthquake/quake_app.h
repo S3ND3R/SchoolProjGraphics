@@ -87,7 +87,8 @@ private:
     // used to draw quake position
     Point3 qPosition_;
 
-    float alpha_;
+    float alphaX_;
+    float alphaY_;
 
     // quake date
     Date qDate;

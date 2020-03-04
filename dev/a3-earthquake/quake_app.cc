@@ -14,7 +14,7 @@ using namespace std;
 
 QuakeApp::QuakeApp() : GraphicsApp(1280,720, "Earthquake"),
     playback_scale_(15000000.0), debug_mode_(false), globe_mode_(false),
-    alpha_(0.0)
+    alphaX_(0.0), alphaY_(0.0)
 {
     // Define a search path for finding data files (images and earthquake db)
     search_path_.push_back(".");
@@ -78,7 +78,8 @@ void QuakeApp::OnLeftMouseDrag(const Point2 &pos, const Vector2 &delta) {
     // Optional: In our demo, we adjust the tilt of the globe here when the
     // mouse is dragged up/down on the screen.
     if (globe_mode_) {
-      alpha_ += 5.0;
+      alphaX_ += delta[0];
+      alphaY_ += delta[1];
     }
 }
 
@@ -86,7 +87,8 @@ void QuakeApp::OnLeftMouseDrag(const Point2 &pos, const Vector2 &delta) {
 void QuakeApp::OnGlobeBtnPressed() {
     // TODO: This is where you can switch between flat earth mode and globe mode
     earth_.ResetAlpha();
-    alpha_ = 0.0;
+    alphaX_ = 0.0;
+    alphaY_ = 0.0;
     globe_mode_ = !globe_mode_;
 }
 
@@ -167,7 +169,8 @@ void QuakeApp::DrawUsingOpenGL() {
     // Draw the earth
     Matrix4 mEarth;
     if (globe_mode_){
-      mEarth = Matrix4::RotationY(GfxMath::ToRadians(alpha_));
+      mEarth = Matrix4::RotationY(GfxMath::ToRadians(alphaX_)) *
+               Matrix4::RotationX(GfxMath::ToRadians(alphaY_));
     }
     earth_.Draw(model_matrix * mEarth, view_matrix_, proj_matrix_);
     if (debug_mode_) {
@@ -194,7 +197,8 @@ void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix
     normMag = normMag * .10;
     Matrix4 Mquake;
     if (globe_mode_){
-      Mquake = Matrix4::RotationY(GfxMath::ToRadians(alpha_)) *
+      Mquake = Matrix4::RotationY(GfxMath::ToRadians(alphaX_)) *
+               Matrix4::RotationX(GfxMath::ToRadians(alphaY_)) *
                Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
                Matrix4::Scale(Vector3(normMag, normMag, normMag));
     } else {
