@@ -83,12 +83,8 @@ void QuakeApp::OnLeftMouseDrag(const Point2 &pos, const Vector2 &delta) {
 
 void QuakeApp::OnGlobeBtnPressed() {
     // TODO: This is where you can switch between flat earth mode and globe mode
+    earth_.ResetAlpha();
     globe_mode_ = !globe_mode_;
-    if (globe_mode_) {
-      earth_.InitSphere();
-    } else {
-      earth_.InitPlane();
-    }
 }
 
 void QuakeApp::OnDebugBtnPressed() {
@@ -120,7 +116,8 @@ void QuakeApp::UpdateSimulation(double dt)  {
 
     // TODO: Any animation, morphing, rotation of the earth, or other things that should
     // be updated once each frame would go here.
-    // double max_window = current_time_ + PLAYBACK_WINDOW;
+
+    // update the quakes to draw based on the current_time_
     double min_window = current_time_ - PLAYBACK_WINDOW;
     int qindx = quake_db_.FindMostRecentQuake(d);
     double qDate = quake_db_.earthquake(qindx).date().ToSeconds();
@@ -132,6 +129,13 @@ void QuakeApp::UpdateSimulation(double dt)  {
       }
       qindx--;
       }
+
+    // testing smooth transition
+    if (globe_mode_) {
+      earth_.TransformSphere(dt);
+    } else {
+      earth_.TransformPlane(dt);
+    }
   }
 
 
@@ -183,9 +187,10 @@ void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix
       qPosition_ = earth_.LatLongToPlane(qlat, qlong);
     }
     float normMag = (quake_window_[i].magnitude() - minMag_) / (maxMag_ - minMag_);
-    Color qcol(normMag,0,0);
+    Color qcol(normMag * 1.5,0.2,0.1);
+    normMag = normMag * .10;
     Matrix4 Mquake = Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
-                     Matrix4::Scale(Vector3(.05, .05, .05));
+                     Matrix4::Scale(Vector3(normMag, normMag, normMag));
     quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
   }
 }

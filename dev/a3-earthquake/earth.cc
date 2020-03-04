@@ -11,7 +11,7 @@
 #include <math.h>
 
 
-Earth::Earth() {
+Earth::Earth() : alpha_(0) {
 }
 
 Earth::~Earth() {
@@ -157,4 +157,52 @@ void Earth::InitPlane() {
   earth_mesh_.SetVertices(p_vertices_);
   earth_mesh_.SetNormals(p_normals_);
   earth_mesh_.UpdateGPUMemory();
+}
+
+void Earth::TransformSphere(double timestep) {
+  alpha_ += timestep;
+  t_vertices_.clear();
+  t_normals_.clear();
+  if (alpha_ < 1) {
+    for (int i = 0; i < p_vertices_.size(); i++) {
+      t_vertices_.push_back(p_vertices_[i].Lerp(s_vertices_[i], alpha_));
+      t_normals_.push_back(p_normals_[i].Lerp(s_normals_[i], alpha_));
+    }
+    earth_mesh_.SetVertices(t_vertices_);
+    earth_mesh_.SetNormals(s_normals_);
+    earth_mesh_.UpdateGPUMemory();
+    return;
+  } else {
+    alpha_ = 2;
+    earth_mesh_.SetVertices(s_vertices_);
+    earth_mesh_.SetNormals(s_normals_);
+    earth_mesh_.UpdateGPUMemory();
+    return;
+  }
+}
+
+void Earth::TransformPlane(double timestep) {
+  alpha_ += timestep;
+  t_vertices_.clear();
+  t_normals_.clear();
+  if (alpha_ < 1) {
+    for (int i = 0; i < s_vertices_.size(); i++) {
+      t_vertices_.push_back(s_vertices_[i].Lerp(p_vertices_[i], alpha_));
+      t_normals_.push_back(s_normals_[i].Lerp(p_normals_[i], alpha_));
+    }
+    earth_mesh_.SetVertices(t_vertices_);
+    earth_mesh_.SetNormals(s_normals_);
+    earth_mesh_.UpdateGPUMemory();
+    return;
+  } else {
+    alpha_ = 2;
+    earth_mesh_.SetVertices(p_vertices_);
+    earth_mesh_.SetNormals(p_normals_);
+    earth_mesh_.UpdateGPUMemory();
+    return;
+  }
+}
+
+void Earth::ResetAlpha() {
+  alpha_ = 0.0;
 }

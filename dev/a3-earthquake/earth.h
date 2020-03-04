@@ -40,6 +40,13 @@ public:
 
     void InitSphere();
 
+    void TransformSphere(double timestep);
+
+    void TransformPlane(double timestep);
+
+    void ResetAlpha();
+
+
 protected:
 
     // Stores the earth texture map
@@ -60,6 +67,10 @@ protected:
     std::vector<Vector3> p_normals_;
     std::vector<Point3> s_vertices_;
     std::vector<Vector3> s_normals_;
+    std::vector<Point3> t_vertices_;
+    std::vector<Vector3> t_normals_;
+
+    double alpha_;
 };
 
 
