@@ -77,13 +77,16 @@ void QuakeApp::InitNanoGUI() {
 void QuakeApp::OnLeftMouseDrag(const Point2 &pos, const Vector2 &delta) {
     // Optional: In our demo, we adjust the tilt of the globe here when the
     // mouse is dragged up/down on the screen.
-    //alpha_ += 5.0;
+    if (globe_mode_) {
+      alpha_ += 5.0;
+    }
 }
 
 
 void QuakeApp::OnGlobeBtnPressed() {
     // TODO: This is where you can switch between flat earth mode and globe mode
     earth_.ResetAlpha();
+    alpha_ = 0.0;
     globe_mode_ = !globe_mode_;
 }
 
@@ -163,9 +166,9 @@ void QuakeApp::DrawUsingOpenGL() {
 
     // Draw the earth
     Matrix4 mEarth;
-    // if (globe_mode_){
-    //   mEarth = Matrix4::RotationY(GfxMath::ToRadians(alpha_));
-    // }
+    if (globe_mode_){
+      mEarth = Matrix4::RotationY(GfxMath::ToRadians(alpha_));
+    }
     earth_.Draw(model_matrix * mEarth, view_matrix_, proj_matrix_);
     if (debug_mode_) {
         earth_.DrawDebugInfo(model_matrix, view_matrix_, proj_matrix_);
@@ -189,8 +192,15 @@ void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix
     float normMag = (quake_window_[i].magnitude() - minMag_) / (maxMag_ - minMag_);
     Color qcol(normMag * 1.5,0.2,0.1);
     normMag = normMag * .10;
-    Matrix4 Mquake = Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
-                     Matrix4::Scale(Vector3(normMag, normMag, normMag));
+    Matrix4 Mquake;
+    if (globe_mode_){
+      Mquake = Matrix4::RotationY(GfxMath::ToRadians(alpha_)) *
+               Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
+               Matrix4::Scale(Vector3(normMag, normMag, normMag));
+    } else {
+      Mquake = Matrix4::Translation(qPosition_ - Point3(0,0,0)) *
+               Matrix4::Scale(Vector3(normMag, normMag, normMag));
+    }
     quick_shapes_.DrawSphere(model_matrix * Mquake, view_matrix_, proj_matrix_, qcol);
   }
 }
