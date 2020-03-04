@@ -193,7 +193,9 @@ void QuakeApp::DrawQuake(const Matrix4 &model_matrix, const Matrix4 &view_matrix
       qPosition_ = earth_.LatLongToPlane(qlat, qlong);
     }
     float normMag = (quake_window_[i].magnitude() - minMag_) / (maxMag_ - minMag_);
-    Color qcol(normMag * 1.5,0.2,0.1);
+    float colorMag = 0 + (3 - 0) * normMag;
+    std::cout << colorMag << std::endl;
+    Color qcol(colorMag,0.2,0.1);
     normMag = normMag * .10;
     Matrix4 Mquake;
     if (globe_mode_){
