@@ -78,11 +78,14 @@ World-Space. Lastly, show the numeric representation of `pInWorldSpace`.
 Point3 pInDoorSpace = Point3(0.2, 0.4, 0.0);
 
 // Combined transformation from Door-Space -> World-Space
-Matrix4 doorSpaceToWorldSpace = /* --- Fill this in --- */
+Matrix4 doorSpaceToWorldSpace = houseToWorld * sidingToHouse * doorToSiding;
 
 // The point `p` in world space
-Point3 pInWorldSpace = /* --- Fill this in --- */
+Point3 pInWorldSpace = doorSpaceToWorldSpace * pInDoorSpace;
 
 std::cout << "p in World-Space: " << pInWorldSpace << std::endl;
-/* --- Fill in output for std::cout here --- */
+/* --- Fill in output for std::cout here ---
+  -0.3, 0.7, 0
+*/
+
 ```
