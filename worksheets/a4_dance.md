@@ -38,6 +38,10 @@ The initial model is located at the origin:
 
 Include your pictures for each diagram here (there should be 5 total)
 
+![2D house page 1](./img/house_1.jpg)
+![2D house page 2](./img/house_2.jpg)
+![2D house page 3](./img/house_3.jpg)
+
 --------------------------------------------------------------------------------
 
 

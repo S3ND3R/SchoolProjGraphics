@@ -68,7 +68,7 @@ void AngryVectors::InitNanoGUI() {
 
 void AngryVectors::InitOpenGL() {
     // Set up the camera in a good position to see the entire scene
-    proj_matrix_ = Matrix4::Perspective(60, aspect_ratio(), 0.01, 100);
+    proj_matrix_ = Matrix4::Perspective(30, aspect_ratio(), 0.01, 100);
     view_matrix_ = Matrix4::LookAt(Point3(0,4,40), Point3(0,0,0), Vector3(0,1,0));
     glClearColor(0.2, 0.6, 1.0, 1);
 }
@@ -80,7 +80,7 @@ void AngryVectors::DrawUsingOpenGL() {
     quick_shapes_.DrawCube(ground_matrix, view_matrix_, proj_matrix_, Color(0.3, 0.9, 0.4));
 
     // 3 targets
-    Matrix4 target1_matrix = Matrix4::Translation(Vector3(21, 6, -35)) * Matrix4::Scale(Vector3(2, 6, 10));
+    Matrix4 target1_matrix = Matrix4::Translation(Vector3(0, 5, 0));
     quick_shapes_.DrawCube(target1_matrix, view_matrix_, proj_matrix_, Color(0.6, 0.4, 0.2));
 
     Matrix4 target2_matrix = Matrix4::Translation(Vector3(25, 6, -35)) * Matrix4::Scale(Vector3(1.5, 6, 10));
