@@ -12,10 +12,10 @@ DanceApp::DanceApp() : GraphicsApp(1280,768, "So You Think Ants Can Dance") {
     searchPath_.push_back("./data");
     searchPath_.push_back(DATA_DIR_INSTALL);
     searchPath_.push_back(DATA_DIR_BUILD);
-    
-    
+
+
     // INIT SALSA DANCING PAIR
-    
+
     // 1. Load skeletons
     salsa_ant_male_.LoadSkeleton(Platform::FindFile("60.asf", searchPath_));
     salsa_ant_male_.set_fps(60.0);
@@ -35,14 +35,14 @@ DanceApp::DanceApp() : GraphicsApp(1280,768, "So You Think Ants Can Dance") {
     female_salsa_motion.TrimFront(100);
     female_salsa_motion.TrimBack(150);
     female_salsa_motion.MakeLoop(100);
-    
+
     // 3. Make the animated characters play the motion clips, the clips will automatically repeat
     salsa_ant_male_.Play(male_salsa_motion);
     salsa_ant_female_.Play(female_salsa_motion);
 
-    
+
     // INIT BALLET DANCER
-    
+
     // 1. Load skeleton
     ballet_ant_.LoadSkeleton(Platform::FindFile("61.asf", searchPath_));
 
@@ -51,7 +51,7 @@ DanceApp::DanceApp() : GraphicsApp(1280,768, "So You Think Ants Can Dance") {
     ballet_base_loop_.TrimBack(600);
     ballet_base_loop_.MakeLoop(50);
     ballet_base_loop_.CalcRelativeTranslations();
-    
+
     ballet_special1_.LoadFromAMC(Platform::FindFile("05_02.amc", searchPath_), *ballet_ant_.skeleton_ptr());
     ballet_special1_.TrimFront(280);
     ballet_special1_.TrimBack(200);
@@ -62,15 +62,15 @@ DanceApp::DanceApp() : GraphicsApp(1280,768, "So You Think Ants Can Dance") {
     // you can use the same dance moves that we did.  We used:
     // 05_10.amc, 05_09.amc, 05_20.amc, and 05_06.amc -- you need to trim them
     // isolate the interesting portions of the motion.
-    
-    
-    
-    
-    
+
+
+
+
+
     // 3. Start the base loop motion
     ballet_ant_.Play(ballet_base_loop_);
-    
-    
+
+
     salsa_ants_transform_ = Matrix4::Translation(Vector3(1, 0, 0.5));
     ballet_ant_transform_ = Matrix4::Translation(Vector3(-1, ballet_base_loop_.pose(0).root_position()[1], 0));
 }
@@ -85,7 +85,7 @@ void DanceApp::InitNanoGUI() {
     window->setPosition(Eigen::Vector2i(10, 10));
     window->setSize(Eigen::Vector2i(200,100));
     window->setLayout(new nanogui::GroupLayout());
-    
+
     nanogui::Button* btn1 = new nanogui::Button(window, "Motion 1");
     btn1->setCallback(std::bind(&DanceApp::OnMotion1BtnPressed, this));
 
@@ -109,7 +109,7 @@ void DanceApp::InitOpenGL() {
     projMatrix_ = Matrix4::Perspective(60.0, aspect_ratio(), 0.01, 100);
     viewMatrix_ = Matrix4::LookAt(Point3(0,1.5,3.5), Point3(0,1,0), Vector3(0,1,0));
     glClearColor(0.5, 0.5, 0.5, 1);
-    
+
     bg_tex_.InitFromFile(Platform::FindFile("ants-dance.png", searchPath_));
     floor_tex_.InitFromFile(Platform::FindFile("woodfloor.png", searchPath_));
 }
@@ -149,7 +149,7 @@ void DanceApp::DrawUsingOpenGL() {
     quick_shapes_.DrawFullscreenTexture(Color(1,1,1), bg_tex_);
 
     // Draw the dancing characters.
-    
+
     // The salsa ants are drawn using absolute positioning
     salsa_ant_male_.Draw(salsa_ants_transform_, viewMatrix_, projMatrix_, true);
     salsa_ant_female_.Draw(salsa_ants_transform_, viewMatrix_, projMatrix_, true);
@@ -157,13 +157,8 @@ void DanceApp::DrawUsingOpenGL() {
     // The ballet ant is drawn with relative positioning
     ballet_ant_.Draw(ballet_ant_transform_, viewMatrix_, projMatrix_, false);
 
-    
+
     // Draw the dance floor
     Matrix4 M_floor = Matrix4::Scale(Vector3(8, 1, 3));
     quick_shapes_.DrawSquare(M_floor, viewMatrix_, projMatrix_, Color(1,1,1), floor_tex_);
 }
-
-
-
-
-
