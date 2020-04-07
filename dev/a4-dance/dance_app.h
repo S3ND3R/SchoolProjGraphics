@@ -12,7 +12,7 @@
 /** DanceApp extends GraphicsApp to implement the dancing ants assignment. */
 class DanceApp : public GraphicsApp {
 public:
-    
+
     DanceApp();
     virtual ~DanceApp();
 
@@ -28,7 +28,7 @@ public:
     /// gets called once per frame and passes the elapsed time since the last
     /// frame, so this is exactly the right place to advance the mocap playback.
     void UpdateSimulation(double dt);
-    
+
     /// Used to initialize the on-screen GUI elements
     void InitNanoGUI();
 
@@ -38,10 +38,10 @@ public:
     /// This is the place to draw the actual animated characters based upon their
     /// current poses.
     void DrawUsingOpenGL();
-    
-    
+
+
 private:
-    
+
     // The pair of ants dancing the salsa
     AnimatedCharacter salsa_ant_male_;
     AnimatedCharacter salsa_ant_female_;
@@ -49,7 +49,7 @@ private:
     // the right a bit so that the ballet ant can have some space on the dance
     // floor too
     Matrix4 salsa_ants_transform_;
-    
+
     // The ballet dancing ant
     AnimatedCharacter ballet_ant_;
     // Shifts the ballet dancing ant to the left a bit
@@ -65,8 +65,8 @@ private:
     MotionClip ballet_special4_;
     MotionClip ballet_special5_;
 
-    
-    
+
+
     // A list of paths to search for data files (images and shaders)
     std::vector<std::string> searchPath_;
 
@@ -80,6 +80,8 @@ private:
     // Textures for the background image and floor
     Texture2D bg_tex_;
     Texture2D floor_tex_;
+
+    int trim_debug_num_;
 };
 
 #endif
