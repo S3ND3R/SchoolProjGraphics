@@ -223,21 +223,31 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
     // bone.  To start, this will just draw the axes for the root node of the
     // character, but once you add the recursive call to draw the children, this
     // will draw the axes for each bone.
+    Matrix4 S;
+    Matrix4 R;
+    Matrix4 T;
     Color bColor = Color(1,1,1);
     Vector3 boneEnd = skeleton_.BoneDirectionAndLength(bone_name);
-    // Matrix4 S = Matrix4::Scale(Vector3(0.15,0.15,0.15));
-    Matrix4 S = Matrix4::Scale(Vector3(0.05,0.05,0.05));
-    //Matrix4 b_trans = Matrix4::Translation(boneEnd);
+    S = Matrix4::Scale(Vector3(0.05,0.05,0.05));
     Point3 boneStart = Point3(0.0, 0.0, 0.0);
     quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
-    //quick_shapes_.DrawCylinder(ctm * b_trans * S, view_matrix, proj_matrix, bColor);
-    //quick_shapes_.DrawCylinder(ctm * S, view_matrix, proj_matrix, bColor);
-    //quick_shapes_.DrawAxes(ctm * S, view_matrix, proj_matrix);
+
+
+
 
 
     // TODO: Eventually, you'll want to draw something different depending on which part
     // of the body is being drawn.  An if statement like this is an easy way to do that.
     if (bone_name == "lhipjoint" || bone_name == "rhipjoint") {
+
+      S = Matrix4::Scale(Vector3(0.15,0.15,0.15));
+      quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
+
+      T = Matrix4::Translation(Vector3(0.0,0.0,-0.10));
+      R = Matrix4::RotationX(GfxMath::ToRadians(275.0));
+      S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
+      quick_shapes_.DrawCone(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
     }
     if (bone_name == "lfemur" || bone_name == "rfemur") {
     }
@@ -248,14 +258,24 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
     if (bone_name == "ltoes" || bone_name == "rtoes") {
     }
     if (bone_name == "lowerback") {
+      S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
+      quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "upperback") {
+      S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
+      quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "thorax") {
+      S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
+      quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "lowerneck" || bone_name == "upperneck") {
     }
     if (bone_name == "head") {
+      S = Matrix4::Scale(Vector3(0.10,0.13,0.20));
+      R = Matrix4::RotationX(GfxMath::ToRadians(45.0));
+      T = Matrix4::Translation(Vector3(0.0,0.15,0.0));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "lclavicle" || bone_name == "rclavicle") {
     }
