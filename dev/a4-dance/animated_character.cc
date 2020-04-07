@@ -226,22 +226,20 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
     Matrix4 S;
     Matrix4 R;
     Matrix4 T;
-    Color bColor = Color(1,1,1);
+    Color bColor = Color(1,0.5,0.5);
     Vector3 boneEnd = skeleton_.BoneDirectionAndLength(bone_name);
     S = Matrix4::Scale(Vector3(0.05,0.05,0.05));
     Point3 boneStart = Point3(0.0, 0.0, 0.0);
-    quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
-
-
-
 
 
     // TODO: Eventually, you'll want to draw something different depending on which part
     // of the body is being drawn.  An if statement like this is an easy way to do that.
     if (bone_name == "lhipjoint" || bone_name == "rhipjoint") {
 
-      S = Matrix4::Scale(Vector3(0.15,0.15,0.15));
-      quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
+      S = Matrix4::Scale(Vector3(0.20,0.20,0.25));
+      T = Matrix4::Translation(Vector3(0.0,0.0,-0.10));
+      R = Matrix4::RotationX(GfxMath::ToRadians(-55.0));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
 
       T = Matrix4::Translation(Vector3(0.0,0.0,-0.10));
       R = Matrix4::RotationX(GfxMath::ToRadians(275.0));
@@ -250,12 +248,24 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
 
     }
     if (bone_name == "lfemur" || bone_name == "rfemur") {
+      bColor = Color(1,0.40,0.40);
+      quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
     }
     if (bone_name == "ltibia" || bone_name == "rtibia") {
+      bColor = Color(1,0.40,0.40);
+      quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
     }
     if (bone_name == "lfoot" || bone_name == "rfoot") {
+      S = Matrix4::Scale(Vector3(0.05,0.03,0.1));
+      T = Matrix4::Translation(Vector3(0.0,-0.02,0.03));
+      R = Matrix4::RotationX(GfxMath::ToRadians(25));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "ltoes" || bone_name == "rtoes") {
+      // S = Matrix4::Scale(Vector3(0.05,0.05,.05));
+      // R = Matrix4::RotationX(GfxMath::ToRadians(95));
+      // T = Matrix4::Translation(Vector3(0.0,0.0,0.06));
+      // quick_shapes_.DrawSphere(ctm * T * R * S, view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "lowerback") {
       S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
@@ -266,24 +276,73 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
       quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "thorax") {
-      S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
+      bColor = Color(1,0.40,0.40);
+      S = Matrix4::Scale(Vector3(0.15,0.15,0.15));
       quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "lowerneck" || bone_name == "upperneck") {
+      T = Matrix4::Translation(Vector3(0.0,-0.025,0.0));
+      S = Matrix4::Scale(Vector3(0.10,0.12,0.10));
+      quick_shapes_.DrawSphere(ctm * T * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "head") {
       S = Matrix4::Scale(Vector3(0.10,0.13,0.20));
       R = Matrix4::RotationX(GfxMath::ToRadians(45.0));
       T = Matrix4::Translation(Vector3(0.0,0.15,0.0));
       quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
+      //eyes
+      bColor = Color(0,0,0);
+      S = Matrix4::Scale(Vector3(0.08,0.05,0.05));
+      T = Matrix4::Translation(Vector3(0.07,0.2,0.03));
+      R = Matrix4::RotationY(GfxMath::ToRadians(-45));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
+      S = Matrix4::Scale(Vector3(0.08,0.05,0.05));
+      T = Matrix4::Translation(Vector3(-0.07,0.2,0.03));
+      R = Matrix4::RotationY(GfxMath::ToRadians(45));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
+      // right antenna
+      S = Matrix4::Scale(Vector3(0.01,0.01,0.09));
+      T = Matrix4::Translation(Vector3(0.08,0.35,-0.02));
+      R = Matrix4::RotationY(GfxMath::ToRadians(-35)) * Matrix4::RotationX(GfxMath::ToRadians(65));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
+      S = Matrix4::Scale(Vector3(0.01,0.01,0.04));
+      T = Matrix4::Translation(Vector3(0.095,0.45,-0.02));
+      R = Matrix4::RotationY(GfxMath::ToRadians(10)) * Matrix4::RotationX(GfxMath::ToRadians(135));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
+      // left antenna
+      S = Matrix4::Scale(Vector3(0.01,0.01,0.09));
+      T = Matrix4::Translation(Vector3(-0.08,0.35,-0.02));
+      R = Matrix4::RotationY(GfxMath::ToRadians(35)) * Matrix4::RotationX(GfxMath::ToRadians(65));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
+      S = Matrix4::Scale(Vector3(0.01,0.01,0.04));
+      T = Matrix4::Translation(Vector3(-0.095,0.45,-0.02));
+      R = Matrix4::RotationY(GfxMath::ToRadians(-10)) * Matrix4::RotationX(GfxMath::ToRadians(135));
+      quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+
+
+
     }
     if (bone_name == "lclavicle" || bone_name == "rclavicle") {
+      bColor = Color(1,0.40,0.40);
+      quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
     }
     if (bone_name == "lhumerus" || bone_name == "rhumerus" || bone_name == "lradius" || bone_name == "rradius") {
+      bColor = Color(1,0.40,0.40);
+      quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
     }
     if (bone_name == "lwrist" || bone_name == "rwrist") {
+      bColor = Color(1,0.40,0.40);
+      quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
     }
     if (bone_name == "lhand" || bone_name == "rhand" || bone_name == "lthumb" || bone_name == "rthumb" || bone_name == "rfingers" || bone_name == "lfingers") {
+      bColor = Color(1,0.40,0.40);
+      quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
     }
 
 
