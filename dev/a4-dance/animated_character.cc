@@ -214,37 +214,27 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
     Matrix4 pose_rot = pose_.JointRotation(bone_name);
     Matrix4 rot_space = skeleton_.BoneSpaceToRotAxesSpace(bone_name);
 
-    //ctm = ctm * bone_space * pose_rot * rot_space;
     ctm = ctm * bone_space * pose_rot * rot_space;
 
-
-
-    // Here is a good way to check your work -- draw the coordinate axes for each
-    // bone.  To start, this will just draw the axes for the root node of the
-    // character, but once you add the recursive call to draw the children, this
-    // will draw the axes for each bone.
     Matrix4 S;
     Matrix4 R;
     Matrix4 T;
+    S = Matrix4::Scale(Vector3(0.05,0.05,0.05));
     Color bColor = Color(1,0.5,0.5);
     Vector3 boneEnd = skeleton_.BoneDirectionAndLength(bone_name);
-    S = Matrix4::Scale(Vector3(0.05,0.05,0.05));
     Point3 boneStart = Point3(0.0, 0.0, 0.0);
 
-
-    // TODO: Eventually, you'll want to draw something different depending on which part
-    // of the body is being drawn.  An if statement like this is an easy way to do that.
     if (bone_name == "lhipjoint" || bone_name == "rhipjoint") {
-
       S = Matrix4::Scale(Vector3(0.20,0.20,0.25));
       T = Matrix4::Translation(Vector3(0.0,0.0,-0.10));
       R = Matrix4::RotationX(GfxMath::ToRadians(-55.0));
       quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
 
-      T = Matrix4::Translation(Vector3(0.0,0.0,-0.10));
-      R = Matrix4::RotationX(GfxMath::ToRadians(275.0));
+      bColor = Color(1,0.4,0.4);
+      T = Matrix4::Translation(Vector3(0.0,-0.2,-0.3));
+      R = Matrix4::RotationX(GfxMath::ToRadians(240));
       S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
-      quick_shapes_.DrawCone(ctm * T * R * S , view_matrix, proj_matrix, bColor);
+      quick_shapes_.DrawCone(ctm * T * R* S , view_matrix, proj_matrix, bColor);
 
     }
     if (bone_name == "lfemur" || bone_name == "rfemur") {
@@ -261,12 +251,13 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
       R = Matrix4::RotationX(GfxMath::ToRadians(25));
       quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
     }
-    if (bone_name == "ltoes" || bone_name == "rtoes") {
-      // S = Matrix4::Scale(Vector3(0.05,0.05,.05));
-      // R = Matrix4::RotationX(GfxMath::ToRadians(95));
-      // T = Matrix4::Translation(Vector3(0.0,0.0,0.06));
-      // quick_shapes_.DrawSphere(ctm * T * R * S, view_matrix, proj_matrix, bColor);
-    }
+    // toes are not visible
+    // if (bone_name == "ltoes" || bone_name == "rtoes") {
+    //   S = Matrix4::Scale(Vector3(0.05,0.05,.05));
+    //   R = Matrix4::RotationX(GfxMath::ToRadians(95));
+    //   T = Matrix4::Translation(Vector3(0.0,0.0,0.06));
+    //   quick_shapes_.DrawSphere(ctm * T * R * S, view_matrix, proj_matrix, bColor);
+    // }
     if (bone_name == "lowerback") {
       S = Matrix4::Scale(Vector3(0.10,0.10,0.10));
       quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
@@ -281,9 +272,11 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
       quick_shapes_.DrawSphere(ctm * S , view_matrix, proj_matrix, bColor);
     }
     if (bone_name == "lowerneck" || bone_name == "upperneck") {
-      T = Matrix4::Translation(Vector3(0.0,-0.025,0.0));
-      S = Matrix4::Scale(Vector3(0.10,0.12,0.10));
-      quick_shapes_.DrawSphere(ctm * T * S , view_matrix, proj_matrix, bColor);
+      if (bone_name == "upperneck") {
+        T = Matrix4::Translation(Vector3(0.0,-0.025,0.0));
+        S = Matrix4::Scale(Vector3(0.10,0.12,0.10));
+        quick_shapes_.DrawSphere(ctm * T * S , view_matrix, proj_matrix, bColor);
+      }
     }
     if (bone_name == "head") {
       S = Matrix4::Scale(Vector3(0.10,0.13,0.20));
@@ -324,9 +317,6 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
       T = Matrix4::Translation(Vector3(-0.095,0.45,-0.02));
       R = Matrix4::RotationY(GfxMath::ToRadians(-10)) * Matrix4::RotationX(GfxMath::ToRadians(135));
       quick_shapes_.DrawSphere(ctm * T * R * S , view_matrix, proj_matrix, bColor);
-
-
-
     }
     if (bone_name == "lclavicle" || bone_name == "rclavicle") {
       bColor = Color(1,0.40,0.40);
@@ -345,12 +335,7 @@ void AnimatedCharacter::DrawBoneRecursive(const std::string &bone_name, const Ma
       quick_shapes_.DrawLineSegment(ctm, view_matrix, proj_matrix, bColor, boneStart, boneStart + boneEnd, 0.010);
     }
 
-
     // Step 2: Draw the bone's children
-
-    // TODO: Determining the proper child_root_transform is the key here.  It depends on the
-    // current transformation matrix, but you also need to take into account the
-    // direction and length of the bone in order to reach the root of the children.
     Matrix4 child_root_transform = ctm * skeleton_.BoneSpaceToChildrenSpace(bone_name);
 
     for (int i=0; i<skeleton_.num_children(bone_name); i++) {

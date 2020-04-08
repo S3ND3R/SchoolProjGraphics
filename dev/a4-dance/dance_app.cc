@@ -141,7 +141,7 @@ void DanceApp::OnMotion3BtnPressed() {
 }
 
 void DanceApp::OnMotion4BtnPressed() {
-  ballet_ant_.OverlayClip(ballet_special4_, 70);
+  ballet_ant_.OverlayClip(ballet_special4_, 85);
 }
 
 void DanceApp::OnMotion5BtnPressed() {
