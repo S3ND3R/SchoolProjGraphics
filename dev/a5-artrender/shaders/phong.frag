@@ -22,8 +22,8 @@ void main() {
     // unit vector from the vertex to the eye point, which is at 0,0,0 in "eye space"
     vec3 e = normalize(vec3(0,0,0) - v);
 
-    // normal transformed into "eye space"
-    vec3 n = normal_in_eye_space;
+    // normal in "eye space"
+    vec3 n = normalize(normal_in_eye_space);
 
     // halfway vector
     vec3 h = normalize(l + e);
