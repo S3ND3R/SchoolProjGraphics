@@ -19,11 +19,11 @@ ArtRenderApp::ArtRenderApp() : GraphicsApp(1024,768, "Art Render"),
     search_path_.push_back(".");
     search_path_.push_back("./data");
     search_path_.push_back("./shaders");
-    search_path_.push_back(DATA_DIR_INSTALL);
+    //search_path_.push_back(DATA_DIR_INSTALL);
     search_path_.push_back(DATA_DIR_BUILD);
-    search_path_.push_back(SHADERS_DIR_INSTALL);
+    //search_path_.push_back(SHADERS_DIR_INSTALL);
     search_path_.push_back(SHADERS_DIR_BUILD);
-    
+
     // NOTE: YOU CAN COMMENT OUT SOME OF THESE IF THE APP IS LOADING TOO SLOWLY
     // THE MODEL_FILES ARRAY JUST NEEDS TO HOLD AT LEAST ONE MODEL.
 	// Also, compiling in Release mode will optimize the loading of text files a lot.
@@ -131,7 +131,7 @@ void ArtRenderApp::InitOpenGL() {
     glClearColor(0.7, 0.7, 0.7, 1);
 
 	// Customize the lighting used for the quick shapes default shader to make the
-	// ambient really bright since we're using it to draw the yellow "light bulb" 
+	// ambient really bright since we're using it to draw the yellow "light bulb"
 	// in the scene.
 	DefaultShader::LightProperties qs_light;
 	qs_light.ambient_intensity = Color(0.8, 0.8, 0.8);
@@ -173,31 +173,31 @@ void ArtRenderApp::LoadShadersAndTextures() {
 void ArtRenderApp::DrawUsingOpenGL() {
     // Just the identity matrix
     Matrix4 model_matrix;
-    
+
     // Lighting parameters
     static const Color Ia(0.3, 0.3, 0.3, 1);
     static const Color Id(0.7, 0.7, 0.7, 1);
     static const Color Is(1.0, 1.0, 1.0, 1);
-    
+
     // Material parameters
     static const Color ka(1.0, 0.4, 0.4, 1);
     static const Color kd(1.0, 0.4, 0.4, 1);
     static const Color ks(0.6, 0.6, 0.6, 1);
     static const float s = 50;
-    
+
     // Precompute items needed in the shader
-    
+
     // Light positions are usually defined in world space.  For lighting calculations
     // we need the position of the light in view space (a.k.a. eye space).
     Point3 light_in_eye_space = uni_cam_.view_matrix() * light_pos_;
-    
+
     // The shader also needs these matrices
-    Matrix4 model_view_matrix = uni_cam_.view_matrix()*model_matrix;
+    Matrix4 model_view_matrix = uni_cam_.view_matrix() * model_matrix;
     Matrix4 normal_matrix = model_view_matrix.Inverse().Transpose();
-    
+
     // Make sure the default option to only draw front facing triangles is set
     glEnable(GL_CULL_FACE);
-    
+
 	if (shader_style_ == 0) {
 
 		// Render the current model's mesh using the Gouraud shader program
@@ -290,4 +290,3 @@ void ArtRenderApp::DrawUsingOpenGL() {
     // Draw the UniCam widget when in rotation mode
     uni_cam_.Draw(proj_matrix_);
 }
-
