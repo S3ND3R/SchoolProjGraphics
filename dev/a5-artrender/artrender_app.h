@@ -72,6 +72,9 @@ private:
 	// per-vertex gouraud shading
 	ShaderProgram gouraud_shaderprog_;
 
+	// gouraud textures
+	Texture2D surface_tex_;
+
 	// standard per-pixel phong shading
 	ShaderProgram phong_shaderprog_;
 

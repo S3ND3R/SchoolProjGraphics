@@ -30,6 +30,9 @@ layout(location = 1) in vec3 normal;
 // calculated based on lighting this vertex
 out vec4 color;
 
+// outputting calculated texture coordinates to use surface texture
+out vec2 texcoords;
+
 
 void main() {
 
@@ -58,4 +61,10 @@ void main() {
 
   // do the standard projection of the incoming vertex
   gl_Position = proj_matrix * model_view_matrix * vec4(vertex,1);
+
+  // calculate texture coords assuming a spherical mapping
+  vec3 vertex_on_unit_sphere = vec3(0,0,0) + normalize(vertex - vec3(0,0,0));
+  texcoords.s = asin(vertex_on_unit_sphere.x) / 3.14 + 0.5;
+  texcoords.t = 1.0 - (asin(vertex_on_unit_sphere.y) / 3.14 + 0.5);
+
 }
