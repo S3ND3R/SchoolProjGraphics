@@ -165,8 +165,8 @@ void ArtRenderApp::LoadShadersAndTextures() {
 
 	// To try out different shading styles, you can replace diffuse.png and specular.png with
 	// some of the other texture files in the data/ directory.
-	diffuse_ramp_.InitFromFile(Platform::FindFile("diffuse.png", search_path_));
-	specular_ramp_.InitFromFile(Platform::FindFile("specular.png", search_path_));
+	diffuse_ramp_.InitFromFile(Platform::FindFile("toonDiffuse.png", search_path_));
+	specular_ramp_.InitFromFile(Platform::FindFile("toonSpecular.png", search_path_));
 
   // loading in gouraud surface textures
   surface_tex_.InitFromFile(Platform::FindFile("monalisa.png", search_path_));
@@ -277,8 +277,8 @@ void ArtRenderApp::DrawUsingOpenGL() {
 
 		// Draw edge mesh
 		outline_shaderprog_.UseProgram();
-		outline_shaderprog_.SetUniform("modelViewMatrix", model_view_matrix);
-		outline_shaderprog_.SetUniform("normalMatrix", normal_matrix);
+		outline_shaderprog_.SetUniform("model_view_matrix", model_view_matrix);
+		outline_shaderprog_.SetUniform("normal_matrix", normal_matrix);
 		outline_shaderprog_.SetUniform("proj_matrix", proj_matrix_);
 		outline_shaderprog_.SetUniform("thickness", thickness);
 		edge_meshes_[current_model_].Draw();
