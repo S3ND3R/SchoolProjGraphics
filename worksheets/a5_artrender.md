@@ -44,7 +44,7 @@ normal and `vec3 nr` for the right normal, fill in the condition on the if
 statement:
 
 ```
-if (/* --- Fill this in --- */)
+if (dot(nl, e) * dot(nr, e) < 0.0)
 ```
 
 ### Q2.2
@@ -52,7 +52,7 @@ For the `nl` and `nr` that appear in your if statement above, should these two
 vectors be transformed to eye space using the `normal_matrix`?
 
 ```
-/* --- Write your answer here (yes / no) --- */
+yes
 ```
 
 ### Q2.3
@@ -62,5 +62,5 @@ forms the silhouette outline. Should this normal vector be transformed to eye
 space using the `normal_matrix`?
 
 ```
-/* --- Write your answer here (yes / no) --- */
+no
 ```
