@@ -18,7 +18,7 @@ vectors point in the right direction to make sense for the equation as written
 
 Replace this image with your diagram:
 
-![](./img/vectors.png)
+![](./img/Local-llumination-Dgrm.png)
 
 
 ## Q2: Silhouette Outline
