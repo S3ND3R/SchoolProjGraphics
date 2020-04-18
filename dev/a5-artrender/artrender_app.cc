@@ -18,8 +18,8 @@ ArtRenderApp::ArtRenderApp() : GraphicsApp(1024,768, "Art Render"),
     // Define a search path for finding data files (images and shaders)
     search_path_.push_back(".");
     search_path_.push_back("./data");
+    search_path_.push_back(DATA_DIR_INSTALL);
     search_path_.push_back("./shaders");
-    //search_path_.push_back(DATA_DIR_INSTALL);
     search_path_.push_back(DATA_DIR_BUILD);
     //search_path_.push_back(SHADERS_DIR_INSTALL);
     search_path_.push_back(SHADERS_DIR_BUILD);
