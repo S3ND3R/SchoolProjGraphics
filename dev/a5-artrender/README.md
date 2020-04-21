@@ -31,7 +31,7 @@ vec4 specular = ks * Is * texture(specular_ramp, vec2(tex_spec_intensity, 0));
 ## Description of A level implementation
 ### Goal: Complete the outline.vert vertex shader to draw a black outline for the silhouette edges of the mesh, when rendering in “artsy” mode.
 - the outline is implemented in outline.vert, by checking the vertex to see if it is a silhouette
-  - this is carried out by using the normals of the to the left and right of the vertex.
+  - this is carried out by using the normals to the left and right of the vertex.
 ```
 if (dot(l_n, e) * dot(r_n, e) < 0.0) {
   // draw an edge
