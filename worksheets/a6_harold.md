@@ -21,7 +21,7 @@ position.
 You can use the following images as inspiration for the shapes that you draw
 in your diagram (replace this image with your final diagram):
 
-![](./img/ray-sphere intersection.png)
+![](./img/sky_camera_example.png)
 
 
 ## Q2: Mouse-Sky Intersections (Part 2)
