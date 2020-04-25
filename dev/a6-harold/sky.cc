@@ -5,12 +5,13 @@
 
 
 Sky::Sky() {
-    
+  radius_ = 1500.0;
+  std::cout << radius_ << std::endl;
 }
 
 
 Sky::~Sky() {
-    
+
 }
 
 void Sky::Init(ShaderProgram *stroke3d_shaderprog) {
@@ -28,29 +29,40 @@ void Sky::Init(ShaderProgram *stroke3d_shaderprog) {
 bool Sky::ScreenPtHitsSky(const Matrix4 &view_matrix, const Matrix4 &proj_matrix,
                         const Point2 &normalized_screen_pt, Point3 *sky_point)
 {
-    // TODO: Stitch together your worksheet implementation of this method
-    return true;
+    Matrix4 camera = view_matrix.Inverse();
+    Point3 eye = camera.ColumnToPoint3(3);
+
+    Point3 mouseIn3d = GfxMath::ScreenToNearPlane(view_matrix,
+                                                  proj_matrix,
+                                                  normalized_screen_pt);
+    Ray pickRay(eye, (mouseIn3d - eye).ToUnit());
+    float t;
+    return pickRay.IntersectSphere(Point3(0,0,0), radius_, &t, sky_point);
 }
-
-
-
 
 /// Creates a new sky stroke mesh by projecting each vertex of the 2D mesh
 /// onto the sky dome and saving the result as a new 3D mesh.
 void Sky::AddSkyStroke(const Matrix4 &view_matrix, const Matrix4 &proj_matrix,
                        const Mesh &stroke2d_mesh, const Color &stroke_color)
 {
-    // TODO: Create a new SkyStroke and add it to the strokes_ array.
+  std::vector<Point3> skyVertices;
+  Mesh skyMesh(stroke2d_mesh);
+  Point3 v;  // vertex that holds the current screen mesh vertex & conversion
 
+  // loop through the vertex of the copy of stroke2d_mesh and convert them to 3d
+  for(int i = 0; i < skyMesh.num_vertices(); i++) {
+    v = skyMesh.vertex(i);
+    Point2 screenPt(v.x(), v.y());
+    ScreenPtHitsSky(view_matrix, proj_matrix, screenPt, &v);
+    skyVertices.push_back(v);
+  }
+  skyMesh.SetVertices(skyVertices);
+  skyMesh.UpdateGPUMemory();
 
-
-
-
-
-
-
-
-
+  SkyStroke skyS;
+  skyS.mesh = skyMesh;
+  skyS.color = stroke_color;
+  strokes_.push_back(skyS);
 }
 
 
@@ -60,7 +72,7 @@ void Sky::Draw(const Matrix4 &view_matrix, const Matrix4 &proj_matrix) {
     // Precompute matrices needed in the shader
     Matrix4 model_matrix; // identity
     Matrix4 modelview_matrix = view_matrix * model_matrix;
-    
+
     // Draw sky meshes
     stroke3d_shaderprog_->UseProgram();
     stroke3d_shaderprog_->SetUniform("modelViewMatrix", modelview_matrix);
@@ -71,4 +83,3 @@ void Sky::Draw(const Matrix4 &view_matrix, const Matrix4 &proj_matrix) {
     }
     stroke3d_shaderprog_->StopProgram();
 }
-

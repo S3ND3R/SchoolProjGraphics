@@ -13,9 +13,9 @@ class Sky {
 public:
     Sky();
     virtual ~Sky();
-    
+
     void Init(ShaderProgram *stroke3d_shaderprog);
-    
+
     /// Projects a 2D normalized screen point (e.g., the mouse position in normalized
     /// device coordinates) to a 3D point on the "sky", which is really a huge sphere
     /// (radius = 1500) that the viewer is inside.  This function should always return
@@ -30,10 +30,10 @@ public:
     /// onto the sky dome and saving the result as a new 3D mesh.
     void AddSkyStroke(const Matrix4 &view_matrix, const Matrix4 &proj_matrix,
                       const Mesh &stroke2d_mesh, const Color &stroke_color);
-    
+
     /// Draws all of the sky strokes
     void Draw(const Matrix4 &view_matrix, const Matrix4 &proj_matrix);
-    
+
 private:
 
     // Each stroke has a 3D mesh and a color
@@ -41,11 +41,13 @@ private:
         Mesh mesh;
         Color color;
     };
-    
+
     // To store a new stroke to draw, add it to this array
     std::vector<SkyStroke> strokes_;
 
-    
+    float radius_;
+
+
     ShaderProgram *stroke3d_shaderprog_;
 };
 
