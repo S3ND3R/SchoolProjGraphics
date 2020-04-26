@@ -7,11 +7,11 @@
 Ground::Ground() : diffuse_ramp_(GL_CLAMP_TO_EDGE),
     specular_ramp_(GL_CLAMP_TO_EDGE), light_pos_(30,30,30)
 {
-    
+
 }
 
 Ground::~Ground() {
-    
+
 }
 
 Mesh* Ground::mesh_ptr() { return &ground_mesh_; }
@@ -21,8 +21,14 @@ void Ground::Init(const std::vector<std::string> &search_path) {
     // init ground geometry, a simple grid is used.  if it is running too slow,
     // you can turn down the resolution by decreasing nx and ny, but this will
     // make the hills look more jaggy.
+
     const int nx = 150;
     const int ny = 150;
+
+    // DEBUGGING
+    // const int nx = 10;
+    // const int ny = 10;
+
     const float size = 100.0;
     std::vector<Point3> verts;
     std::vector<Vector3> norms;
@@ -53,21 +59,19 @@ void Ground::Init(const std::vector<std::string> &search_path) {
     ground_mesh_.UpdateGPUMemory();
     ground_edge_mesh_.CreateFromMesh(ground_mesh_);
 
-    
+
     // load textures and shaders
     diffuse_ramp_.InitFromFile(Platform::FindFile("toonDiffuse.png", search_path));
     specular_ramp_.InitFromFile(Platform::FindFile("toonSpecular.png", search_path));
-    
+
     artsy_shaderprog_.AddVertexShaderFromFile(Platform::FindFile("artsy.vert", search_path));
     artsy_shaderprog_.AddFragmentShaderFromFile(Platform::FindFile("artsy.frag", search_path));
     artsy_shaderprog_.LinkProgram();
-    
+
     outline_shaderprog_.AddVertexShaderFromFile(Platform::FindFile("outline.vert", search_path));
     outline_shaderprog_.AddFragmentShaderFromFile(Platform::FindFile("outline.frag", search_path));
     outline_shaderprog_.LinkProgram();
 }
-
-
 
 
 // Projects a 2D normalized screen point (e.g., the mouse position in normalized
@@ -79,7 +83,7 @@ bool Ground::ScreenPtHitsGround(const Matrix4 &view_matrix, const Matrix4 &proj_
 {
     Matrix4 camera_matrix = view_matrix.Inverse();
     Point3 eye = camera_matrix.ColumnToPoint3(3);
-    
+
     Point3 pt3d = GfxMath::ScreenToNearPlane(view_matrix, proj_matrix, normalized_screen_pt);
     Ray ray(eye, (pt3d - eye).ToUnit());
     float i_time;
@@ -111,7 +115,7 @@ float hfunc(const Vector3 projection_plane_normal, const std::vector<Point3> &si
     Vector3 plane_x = plane_y.Cross(projection_plane_normal).ToUnit();
     // define the origin for a "plane space" coordinate system as the first point in the curve
     Point3 origin = silhouette_curve[0];
-    
+
     // loop over line segments in the curve, find the one that lies over the point by
     // comparing the "plane space" x value for the start and end of the line segment
     // to the "plane space" x value for the closest point to the vertex that lies
@@ -131,7 +135,7 @@ float hfunc(const Vector3 projection_plane_normal, const std::vector<Point3> &si
             return y_curve - closest_pt_in_plane[1];
         }
     }
-    
+
     // here return 0 because the point does not lie under the curve.
     return 0.0;
 }
@@ -148,49 +152,74 @@ void Ground::ReshapeGround(const Matrix4 &view_matrix, const Matrix4 &proj_matri
 {
     // TODO: Deform the 3D ground mesh according to the algorithm described in the
     // Cohen et al. Harold paper.
-    
+
     // You might need the eye point and the look vector, these can be determined
     // from the view matrix as follows:
     Matrix4 camera_matrix = view_matrix.Inverse();
     Point3 eye = camera_matrix.ColumnToPoint3(3);
     Vector3 look = -camera_matrix.ColumnToVector3(2);
-    
-    
-    
+
+
+
     // There are 3 major steps to the algorithm, outlined here:
-    
+
     // 1. Define a plane to project the stroke onto.  The first and last points
     // of the stroke are guaranteed to project onto the ground plane.  The plane
     // should pass through these two points on the ground.  The plane should also
     // have a normal vector that points toward the camera and is parallel to the
     // ground plane.
 
-    
-    
-    
-    
+    Point2 startPt2d = stroke2d.front();
+    Point2 endPt2d = stroke2d.back();
+
+    Point3 startPt3d;
+    ScreenPtHitsGround(view_matrix, proj_matrix, startPt2d, &startPt3d);
+    Point3 endPt3d;
+    ScreenPtHitsGround(view_matrix, proj_matrix, endPt2d, &endPt3d);
+
+    Vector3 plane_vector = startPt3d - endPt3d;
+    Vector3 upDir(0,1,0);
+    Vector3 normal = plane_vector.Cross(upDir);
+    normal.Normalize();
+    if (normal.Dot(look) > 0) {
+      normal = normal * -1;
+    }
+
     // 2. Project the 2D stroke into 3D so that it lies on the "projection plane"
     // defined in step 1.
-    
-    
-    
-    
-    
+
+    std::vector<Point3> s_curve;
+    for(int i = 0; i < stroke2d.size(); i++) {
+      Point3 mouseIn3d = GfxMath::ScreenToNearPlane(view_matrix,
+                                                    proj_matrix,
+                                                    stroke2d[i]);
+      Ray pickRay(eye, (mouseIn3d - eye).ToUnit());
+      float t;
+      Point3 p;
+      pickRay.IntersectPlane(startPt3d, normal, &t, &p);
+      s_curve.push_back(p);
+    }
+
     // 3. Loop through all of the vertices of the ground mesh, and adjust the
     // height of each based on the equations in section 4.5 of the paper, also
     // repeated in the assignment handout.  The equations rely upon a function
     // h(), and we have implemented that for you as hfunc() defined above in
     // this file.  The basic structure of the loop you will need is here:
+
     std::vector<Point3> new_verts;
     for (int i=0; i<ground_mesh_.num_vertices(); i++) {
         Point3 P = ground_mesh_.vertex(i); // original vertex
 
         // adjust P according to equations...
-        
-        
-        
-        
-        
+        Point3 closestPt = P.ClosestPointOnPlane(startPt3d, normal);
+        // distance of the closest point to the plane
+        float d = (P - closestPt).Length();
+        float h = hfunc(normal, s_curve, closestPt);
+        if (h != 0) {
+          float w  = fmax(0, 1 - pow(d / 5.0, 2));
+          float newY = (1.0 - w) * P.y() + w * h;
+          P = Point3(P.x(), newY, P.z());
+        }
         new_verts.push_back(P);
     }
     ground_mesh_.SetVertices(new_verts);
@@ -199,32 +228,29 @@ void Ground::ReshapeGround(const Matrix4 &view_matrix, const Matrix4 &proj_matri
     ground_edge_mesh_.CreateFromMesh(ground_mesh_);
 }
 
-
-
-
 /// Draws the ground mesh with toon shading
 void Ground::Draw(const Matrix4 &view_matrix, const Matrix4 &proj_matrix, const Color &ground_color) {
     // Lighting parameters
     Color Ia(1.0, 1.0, 1.0, 1);
     Color Id(1.0, 1.0, 1.0, 1);
     Color Is(1.0, 1.0, 1.0, 1);
-    
+
     // Material parameters
     Color ka = ground_color;
     Color kd(0.4, 0.4, 0.4, 1);
     Color ks(0.6, 0.6, 0.6, 1);
     float s = 50;
-    
+
     // Precompute matrices needed in the shader
     Matrix4 model_matrix; // identity
     Matrix4 modelview_matrix = view_matrix * model_matrix;
     Matrix4 normal_matrix = modelview_matrix.Inverse().Transpose();
     Point3 light_in_eye_space = view_matrix * light_pos_;
-    
+
     // Make sure the default option to only draw front facing triangles is set
     glEnable(GL_CULL_FACE);
-    
-    
+
+
     // Draw the ground using the artsy shader
     artsy_shaderprog_.UseProgram();
     artsy_shaderprog_.SetUniform("modelViewMatrix", modelview_matrix);
@@ -242,7 +268,7 @@ void Ground::Draw(const Matrix4 &view_matrix, const Matrix4 &proj_matrix, const 
     artsy_shaderprog_.BindTexture("specularRamp", specular_ramp_);
     ground_mesh_.Draw();
     artsy_shaderprog_.StopProgram();
-    
+
     // And, draw silhouette edges for the ground using the outline shader
     glDisable(GL_CULL_FACE);
     glEnable(GL_POLYGON_OFFSET_FILL);
@@ -255,29 +281,27 @@ void Ground::Draw(const Matrix4 &view_matrix, const Matrix4 &proj_matrix, const 
     outline_shaderprog_.SetUniform("thickness", thickness);
     ground_edge_mesh_.Draw();
     outline_shaderprog_.StopProgram();
-    
 
-    
+
+
     // This can be useful for debugging, but it is extremely slow to draw.
     // Before uncommenting this, it's recommended to turn down the resolution
     // of the ground mesh by adjusting the nx and ny constants inside Init().
-    /**
-     // draw lines around each triangle
-     for (int t=0; t<ground_mesh_.num_triangles(); t++) {
-         std::vector<unsigned int> indices = ground_mesh_.triangle_vertices(t);
-         std::vector<Point3> loop;
-         loop.push_back(ground_mesh_.vertex(indices[0]));
-         loop.push_back(ground_mesh_.vertex(indices[1]));
-         loop.push_back(ground_mesh_.vertex(indices[2]));
-         qs_.DrawLines(model_matrix, view_matrix, proj_matrix, Color(0.7,0.7,0.7), loop, QuickShapes::LinesType::LINE_LOOP, 0.01);
-     }
-     
-     // draw normals
-     for (int i=0; i<ground_mesh_.num_vertices(); i++) {
-         Point3 p1 = ground_mesh_.vertex(i);
-         Point3 p2 = p1 + 0.5*ground_mesh_.normal(i);
-         qs_.DrawLineSegment(model_matrix, view_matrix, proj_matrix, Color(0.7,0.7,0.7), p1, p2, 0.01);
-     }
-    **/
-}
 
+     // draw lines around each triangle
+     // for (int t=0; t<ground_mesh_.num_triangles(); t++) {
+     //     std::vector<unsigned int> indices = ground_mesh_.triangle_vertices(t);
+     //     std::vector<Point3> loop;
+     //     loop.push_back(ground_mesh_.vertex(indices[0]));
+     //     loop.push_back(ground_mesh_.vertex(indices[1]));
+     //     loop.push_back(ground_mesh_.vertex(indices[2]));
+     //     qs_.DrawLines(model_matrix, view_matrix, proj_matrix, Color(0.7,0.7,0.7), loop, QuickShapes::LinesType::LINE_LOOP, 0.01);
+     // }
+     //
+     // // draw normals
+     // for (int i=0; i<ground_mesh_.num_vertices(); i++) {
+     //     Point3 p1 = ground_mesh_.vertex(i);
+     //     Point3 p2 = p1 + 0.5*ground_mesh_.normal(i);
+     //     qs_.DrawLineSegment(model_matrix, view_matrix, proj_matrix, Color(0.7,0.7,0.7), p1, p2, 0.01);
+     // }
+}

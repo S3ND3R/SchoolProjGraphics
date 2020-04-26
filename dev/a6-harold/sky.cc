@@ -6,7 +6,6 @@
 
 Sky::Sky() {
   radius_ = 1500.0;
-  std::cout << radius_ << std::endl;
 }
 
 
