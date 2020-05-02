@@ -1,6 +1,6 @@
 ## Assessment for Worksheet 06 (Graded By: CSCI 4611 TAs)
 
-#### Total score: _9_ / _10_
+#### Total score: _10 / _10_
 
 Run on May 02, 01:42:43 AM.
 
@@ -31,9 +31,9 @@ Run on May 02, 01:42:43 AM.
 
     
 
-+ :heavy_check_mark:  _1_ / _2_ :  Q2.4: Correct IntersectSphere call
++ :heavy_check_mark:  _2_ / _2_ :  Q2.4: Correct IntersectSphere call
 
     
 
-#### Total score: _9_ / _10_
+#### Total score: _10 / _10_
 
